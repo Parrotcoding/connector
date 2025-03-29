@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Try Galaxy Mimic</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #connection-section, #apps-section { margin-bottom: 20px; }
+    textarea { width: 100%; margin-bottom: 10px; }
+    #app-tabs { list-style: none; padding: 0; display: flex; gap: 10px; cursor: pointer; }
+    #app-tabs li { padding: 5px 10px; background: #eee; border: 1px solid #ccc; }
+    #app-tabs li:hover { background: #ddd; }
+    #ttt-board td { border: 1px solid #000; width: 60px; height: 60px; text-align: center; font-size: 24px; cursor: pointer; }
+    #chat-window { border: 1px solid #ccc; height: 200px; overflow: auto; margin-bottom: 10px; padding: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Try Galaxy Mimic</h1>
+  <div id="connection-section">
+    <button id="create-session-btn">Create Session</button>
+    <button id="join-session-btn">Join Session</button>
+    <div id="signal-section" style="display:none;">
+      <p><strong>Copy this code and share it with your peer:</strong></p>
+      <textarea id="signal-output" placeholder="Signal code will appear here..." readonly></textarea>
+      <p><strong>Paste remote code here:</strong></p>
+      <textarea id="signal-input" placeholder="Paste remote signal code here"></textarea>
+      <button id="submit-signal-btn">Submit Signal</button>
+    </div>
+  </div>
+
+  <div id="apps-section" style="display:none;">
+    <h2>Mini Apps</h2>
+    <ul id="app-tabs">
+      <li data-app="chat">Chat</li>
+      <li data-app="notepad">Notepad</li>
+      <li data-app="tic-tac-toe">Tic Tac Toe</li>
+    </ul>
+    <div id="app-container">
+      <!-- App content loads here -->
+    </div>
+  </div>
+
+  <!-- Include SimplePeer from CDN -->
+  <script src="https://unpkg.com/simple-peer/simplepeer.min.js"></script>
+  <script>
+    let peer;
+    let currentRole = ""; // "initiator" or "receiver"
+
+    const createSessionBtn = document.getElementById("create-session-btn");
+    const joinSessionBtn = document.getElementById("join-session-btn");
+    const signalSection = document.getElementById("signal-section");
+    const signalOutput = document.getElementById("signal-output");
+    const signalInput = document.getElementById("signal-input");
+    const submitSignalBtn = document.getElementById("submit-signal-btn");
+    const appsSection = document.getElementById("apps-section");
+    const appTabs = document.getElementById("app-tabs");
+    const appContainer = document.getElementById("app-container");
+
+    // When the user creates or joins a session, start the peer
+    createSessionBtn.addEventListener("click", () => {
+      currentRole = "initiator";
+      startPeer(true);
+      signalSection.style.display = "block";
+    });
+
+    joinSessionBtn.addEventListener("click", () => {
+      currentRole = "receiver";
+      startPeer(false);
+      signalSection.style.display = "block";
+    });
+
+    // Submit the remote signal code
+    submitSignalBtn.addEventListener("click", () => {
+      const remoteSignal = signalInput.value;
+      try {
+        const signalData = JSON.parse(remoteSignal);
+        peer.signal(signalData);
+      } catch (e) {
+        alert("Invalid signal data");
+      }
+    });
+
+    function startPeer(isInitiator) {
+      peer = new SimplePeer({ initiator: isInitiator, trickle: false });
+      
+      // When local signal data is generated, display it for copy-paste
+      peer.on('signal', data => {
+        signalOutput.value = JSON.stringify(data);
+      });
+
+      // When connection is established, hide connection UI and show mini apps
+      peer.on('connect', () => {
+        alert("Connection established!");
+        document.getElementById("connection-section").style.display = "none";
+        appsSection.style.display = "block";
+        setupApps();
+      });
+
+      // Handle incoming data from the peer
+      peer.on('data', data => {
+        try {
+          const message = JSON.parse(data);
+          if (message.app === "chat") {
+            appendChatMessage("Remote: " + message.payload);
+          } else if (message.app === "notepad") {
+            document.getElementById("notepad-area").value = message.payload;
+          } else if (message.app === "tic-tac-toe") {
+            handleTicTacToeMove(message.payload);
+          }
+        } catch (e) {
+          console.error("Error parsing incoming data", e);
+        }
+      });
+    }
+
+    // Function to send data through the peer connection
+    function sendData(app, payload) {
+      const message = JSON.stringify({ app, payload });
+      peer.send(message);
+    }
+
+    // --- Mini Apps Setup ---
+    function setupApps() {
+      // Tab switching for apps
+      appTabs.addEventListener("click", e => {
+        if (e.target && e.target.dataset.app) {
+          openApp(e.target.dataset.app);
+        }
+      });
+      // Open default app
+      openApp("chat");
+    }
+
+    // Load a specific mini app into the app container
+    function openApp(appName) {
+      appContainer.innerHTML = "";
+      if (appName === "chat") {
+        const chatDiv = document.createElement("div");
+        chatDiv.innerHTML = `
+          <div id="chat-window"></div>
+          <input type="text" id="chat-input" placeholder="Type a message" />
+          <button id="chat-send-btn">Send</button>
+        `;
+        appContainer.appendChild(chatDiv);
+        document.getElementById("chat-send-btn").addEventListener("click", () => {
+          const message = document.getElementById("chat-input").value;
+          appendChatMessage("You: " + message);
+          sendData("chat", message);
+          document.getElementById("chat-input").value = "";
+        });
+      } else if (appName === "notepad") {
+        const notepadDiv = document.createElement("div");
+        notepadDiv.innerHTML = `
+          <textarea id="notepad-area" style="width:100%; height:200px;" placeholder="Collaborative notepad"></textarea>
+        `;
+        appContainer.appendChild(notepadDiv);
+        document.getElementById("notepad-area").addEventListener("input", function() {
+          sendData("notepad", this.value);
+        });
+      } else if (appName === "tic-tac-toe") {
+        const tttDiv = document.createElement("div");
+        tttDiv.innerHTML = `
+          <table id="ttt-board" style="border-collapse: collapse;">
+            <tr>
+              <td data-cell="0"></td>
+              <td data-cell="1"></td>
+              <td data-cell="2"></td>
+            </tr>
+            <tr>
+              <td data-cell="3"></td>
+              <td data-cell="4"></td>
+              <td data-cell="5"></td>
+            </tr>
+            <tr>
+              <td data-cell="6"></td>
+              <td data-cell="7"></td>
+              <td data-cell="8"></td>
+            </tr>
+          </table>
+          <p id="ttt-status"></p>
+        `;
+        appContainer.appendChild(tttDiv);
+        initTicTacToe();
+      }
+    }
+
+    // --- Chat App Helper ---
+    function appendChatMessage(msg) {
+      const chatWindow = document.getElementById("chat-window");
+      const p = document.createElement("p");
+      p.textContent = msg;
+      chatWindow.appendChild(p);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // --- Tic Tac Toe App ---
+    let tttBoard = Array(9).fill(null);
+    let currentPlayer = "X";
+
+    function initTicTacToe() {
+      const cells = document.querySelectorAll("#ttt-board td");
+      cells.forEach(cell => {
+        cell.style.width = "60px";
+        cell.style.height = "60px";
+        cell.style.textAlign = "center";
+        cell.style.fontSize = "24px";
+        cell.style.border = "1px solid #000";
+        cell.addEventListener("click", function() {
+          const index = parseInt(this.getAttribute("data-cell"));
+          if (!tttBoard[index]) {
+            tttBoard[index] = currentPlayer;
+            this.textContent = currentPlayer;
+            sendData("tic-tac-toe", { index: index, player: currentPlayer });
+            if (checkWin()) {
+              document.getElementById("ttt-status").textContent = currentPlayer + " wins!";
+            } else {
+              currentPlayer = currentPlayer === "X" ? "O" : "X";
+            }
+          }
+        });
+      });
+    }
+
+    function handleTicTacToeMove(move) {
+      if (typeof move.index === "number" && move.player) {
+        tttBoard[move.index] = move.player;
+        const cell = document.querySelector("#ttt-board td[data-cell='" + move.index + "']");
+        if (cell) {
+          cell.textContent = move.player;
+        }
+      }
+    }
+
+    function checkWin() {
+      const winConditions = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return winConditions.some(condition => {
+        const [a, b, c] = condition;
+        return tttBoard[a] && tttBoard[a] === tttBoard[b] && tttBoard[a] === tttBoard[c];
+      });
+    }
+  </script>
+</body>
+</html>
