@@ -25,6 +25,7 @@
           <strong>Step 1:</strong> Copy the short connection code below and send it to your peer.
         </p>
         <textarea id="signal-output" placeholder="Short connection code will appear here..." readonly></textarea>
+        <button id="copy-code-btn" class="pill-btn">Copy Code</button>
         <p id="signal-paste">
           <strong>Step 2:</strong> Paste your peer's code below.
         </p>
@@ -71,13 +72,34 @@
           </svg>
           <span>Doodle Board</span>
         </div>
-        <div class="home-icon" data-app="pomodoro">
+        <div class="home-icon" data-app="stopwatch">
           <svg class="app-icon" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
-            <line x1="12" y1="7" x2="12" y2="12" stroke="currentColor" stroke-width="2"/>
-            <line x1="12" y1="12" x2="16" y2="14" stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="12" x2="12" y2="7" stroke="currentColor" stroke-width="2"/>
+            <line x1="11" y1="3" x2="13" y2="3" stroke="currentColor" stroke-width="2"/>
           </svg>
-          <span>Pomodoro</span>
+          <span>Stopwatch</span>
+        </div>
+        <div class="home-icon" data-app="unitconverter">
+          <svg class="app-icon" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-width="2" d="M4 12h16"/>
+            <path fill="none" stroke="currentColor" stroke-width="2" d="M12 4v16"/>
+          </svg>
+          <span>Unit Converter</span>
+        </div>
+        <div class="home-icon" data-app="bmicalc">
+          <svg class="app-icon" viewBox="0 0 24 24">
+            <rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span>BMI Calc</span>
+        </div>
+        <div class="home-icon" data-app="tipcalc">
+          <svg class="app-icon" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-width="2" d="M3 12h18"/>
+            <path fill="none" stroke="currentColor" stroke-width="2" d="M12 3v18"/>
+          </svg>
+          <span>Tip Calc</span>
         </div>
       </div>
       <!-- App Container: displays individual mini-app content -->
@@ -98,8 +120,7 @@
     let drawings = [];
     let currentDrawingIndex = 0;
     let todoList = [];
-    let pomodoroTime = 1500; // 25 minutes (in seconds)
-    let pomodoroInterval = null;
+    // New apps (stopwatch, unit converter, BMI calculator, tip calculator) work locally
 
     /* DOM Elements */
     const createSessionBtn = document.getElementById("create-session-btn");
@@ -111,6 +132,7 @@
     const appsSection = document.getElementById("apps-section");
     const homeScreen = document.getElementById("home-screen");
     const appContainer = document.getElementById("app-container");
+    const copyCodeBtn = document.getElementById("copy-code-btn");
 
     /* Connection & Signaling */
     createSessionBtn.addEventListener("click", () => {
@@ -132,6 +154,12 @@
       } catch (e) {
         alert("Invalid connection code. Please ensure the code is correct.");
       }
+    });
+    // Copy Code button functionality
+    copyCodeBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(signalOutput.value).then(() => {
+        alert("Connection code copied to clipboard!");
+      });
     });
     function shortenSignal(text) {
       return LZString.compressToEncodedURIComponent(text);
@@ -172,9 +200,7 @@
             case "doodle":
               handleDoodleData(message.payload);
               break;
-            case "pomodoro":
-              updatePomodoroDisplay(message.payload);
-              break;
+            // New apps do not sync as they are local tools.
           }
         } catch (e) {
           console.error("Error parsing data:", e);
@@ -207,8 +233,14 @@
         openTodoApp();
       } else if (appName === "doodle") {
         openDoodleApp();
-      } else if (appName === "pomodoro") {
-        openPomodoroApp();
+      } else if (appName === "stopwatch") {
+        openStopwatchApp();
+      } else if (appName === "unitconverter") {
+        openUnitConverterApp();
+      } else if (appName === "bmicalc") {
+        openBMICalculatorApp();
+      } else if (appName === "tipcalc") {
+        openTipCalculatorApp();
       }
     }
     document.querySelectorAll(".home-icon").forEach(icon => {
@@ -526,65 +558,126 @@
     }
 
     /* ---------------------------
-       Pomodoro Timer App
+       Stopwatch App
        --------------------------- */
-    function openPomodoroApp() {
-      const pomodoroDiv = document.createElement("div");
-      pomodoroDiv.innerHTML = `
-        <div id="pomodoro-display">25:00</div>
-        <div id="pomodoro-buttons">
-          <button id="pomodoro-start" class="pill-btn">Start</button>
-          <button id="pomodoro-pause" class="pill-btn">Pause</button>
-          <button id="pomodoro-reset" class="pill-btn">Reset</button>
+    function openStopwatchApp() {
+      const swDiv = document.createElement("div");
+      swDiv.innerHTML = `
+        <div id="stopwatch-display">00:00:00</div>
+        <div id="stopwatch-buttons">
+          <button id="sw-start" class="pill-btn">Start</button>
+          <button id="sw-stop" class="pill-btn">Stop</button>
+          <button id="sw-reset" class="pill-btn">Reset</button>
         </div>
       `;
-      appContainer.innerHTML += pomodoroDiv.outerHTML;
-      document.getElementById("pomodoro-start").addEventListener("click", startPomodoro);
-      document.getElementById("pomodoro-pause").addEventListener("click", pausePomodoro);
-      document.getElementById("pomodoro-reset").addEventListener("click", resetPomodoro);
-    }
-    function startPomodoro() {
-      if (pomodoroInterval) return;
-      pomodoroInterval = setInterval(() => {
-        if (pomodoroTime > 0) {
-          pomodoroTime--;
-          updatePomodoroDisplay(formatTime(pomodoroTime));
-          sendData("pomodoro", formatTime(pomodoroTime));
-        } else {
-          clearInterval(pomodoroInterval);
-          pomodoroInterval = null;
-          alert("Time's up!");
-        }
-      }, 1000);
-    }
-    function pausePomodoro() {
-      clearInterval(pomodoroInterval);
-      pomodoroInterval = null;
-    }
-    function resetPomodoro() {
-      pausePomodoro();
-      pomodoroTime = 1500;
-      updatePomodoroDisplay(formatTime(pomodoroTime));
-      sendData("pomodoro", formatTime(pomodoroTime));
-    }
-    function updatePomodoroDisplay(text) {
-      const display = document.getElementById("pomodoro-display");
-      if (display) { display.textContent = text; }
-    }
-    function formatTime(seconds) {
-      const m = Math.floor(seconds / 60);
-      const s = seconds % 60;
-      return `${m < 10 ? "0" + m : m}:${s < 10 ? "0" + s : s}`;
+      appContainer.innerHTML += swDiv.outerHTML;
+      let swInterval = null, swTime = 0;
+      const display = document.getElementById("stopwatch-display");
+      document.getElementById("sw-start").addEventListener("click", () => {
+        if (swInterval) return;
+        swInterval = setInterval(() => {
+          swTime++;
+          display.textContent = formatStopwatch(swTime);
+        }, 1000);
+      });
+      document.getElementById("sw-stop").addEventListener("click", () => {
+        clearInterval(swInterval);
+        swInterval = null;
+      });
+      document.getElementById("sw-reset").addEventListener("click", () => {
+        clearInterval(swInterval);
+        swInterval = null;
+        swTime = 0;
+        display.textContent = formatStopwatch(swTime);
+      });
+      function formatStopwatch(sec) {
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        return `${h<10?"0"+h:h}:${m<10?"0"+m:m}:${s<10?"0"+s:s}`;
+      }
     }
 
     /* ---------------------------
-       Notepad Formatting Functions
+       Unit Converter App (Km ↔ Miles)
        --------------------------- */
-    function execCmd(cmd) {
-      document.execCommand(cmd, false, null);
+    function openUnitConverterApp() {
+      const ucDiv = document.createElement("div");
+      ucDiv.innerHTML = `
+        <p>Enter value in Kilometers:</p>
+        <input type="number" id="km-input" placeholder="Kilometers" />
+        <button id="convert-to-miles" class="pill-btn">Convert to Miles</button>
+        <p id="miles-result"></p>
+        <hr/>
+        <p>Enter value in Miles:</p>
+        <input type="number" id="miles-input" placeholder="Miles" />
+        <button id="convert-to-km" class="pill-btn">Convert to Kilometers</button>
+        <p id="km-result"></p>
+      `;
+      appContainer.innerHTML += ucDiv.outerHTML;
+      document.getElementById("convert-to-miles").addEventListener("click", () => {
+        const km = parseFloat(document.getElementById("km-input").value);
+        if (!isNaN(km)) {
+          const miles = km * 0.621371;
+          document.getElementById("miles-result").textContent = `${km} km = ${miles.toFixed(2)} miles`;
+        }
+      });
+      document.getElementById("convert-to-km").addEventListener("click", () => {
+        const miles = parseFloat(document.getElementById("miles-input").value);
+        if (!isNaN(miles)) {
+          const km = miles / 0.621371;
+          document.getElementById("km-result").textContent = `${miles} miles = ${km.toFixed(2)} km`;
+        }
+      });
     }
-    function changeFont(font) {
-      document.execCommand('fontName', false, font);
+
+    /* ---------------------------
+       BMI Calculator App
+       --------------------------- */
+    function openBMICalculatorApp() {
+      const bmiDiv = document.createElement("div");
+      bmiDiv.innerHTML = `
+        <p>Enter weight (kg):</p>
+        <input type="number" id="weight-input" placeholder="Weight in kg" />
+        <p>Enter height (cm):</p>
+        <input type="number" id="height-input" placeholder="Height in cm" />
+        <button id="bmi-calc-btn" class="pill-btn">Calculate BMI</button>
+        <p id="bmi-result"></p>
+      `;
+      appContainer.innerHTML += bmiDiv.outerHTML;
+      document.getElementById("bmi-calc-btn").addEventListener("click", () => {
+        const weight = parseFloat(document.getElementById("weight-input").value);
+        const height = parseFloat(document.getElementById("height-input").value);
+        if (!isNaN(weight) && !isNaN(height) && height > 0) {
+          const bmi = weight / Math.pow(height/100, 2);
+          document.getElementById("bmi-result").textContent = `BMI: ${bmi.toFixed(2)}`;
+        }
+      });
+    }
+
+    /* ---------------------------
+       Tip Calculator App
+       --------------------------- */
+    function openTipCalculatorApp() {
+      const tipDiv = document.createElement("div");
+      tipDiv.innerHTML = `
+        <p>Enter total bill:</p>
+        <input type="number" id="bill-input" placeholder="Bill Amount" />
+        <p>Enter tip percentage:</p>
+        <input type="number" id="tip-input" placeholder="Tip %" />
+        <button id="tip-calc-btn" class="pill-btn">Calculate Tip</button>
+        <p id="tip-result"></p>
+      `;
+      appContainer.innerHTML += tipDiv.outerHTML;
+      document.getElementById("tip-calc-btn").addEventListener("click", () => {
+        const bill = parseFloat(document.getElementById("bill-input").value);
+        const tipPercent = parseFloat(document.getElementById("tip-input").value);
+        if (!isNaN(bill) && !isNaN(tipPercent)) {
+          const tipAmount = bill * (tipPercent/100);
+          const total = bill + tipAmount;
+          document.getElementById("tip-result").textContent = `Tip: $${tipAmount.toFixed(2)} | Total: $${total.toFixed(2)}`;
+        }
+      });
     }
   </script>
 
@@ -593,19 +686,24 @@
   Guide & Instructions
   ===============================
   1. Setup:
-     - Serve these files via HTTPS or on localhost (e.g., using "python -m http.server").
-     - Open index.html on your device.
+     - Serve this file via HTTPS or on localhost (e.g., using "python -m http.server").
+     - Open the page on your device.
      - For best experience, add Device Connector to your Home Screen.
-  2. In App Mode:
-     - Use the connection buttons to create or join a session (connection codes are shortened).
-     - After connection, a home screen grid of app icons is displayed.
+  2. Connection:
+     - Use the "Create Session" or "Join Session" buttons to establish a peer connection.
+     - Use the "Copy Code" button to copy your connection code, and paste your peer's code.
+  3. Home Screen:
+     - Once connected, a grid of app icons is displayed.
      - Tap an icon to open that mini‑app; use the "Home" button to return.
         • Chat: Exchange messages.
-        • Notepad: Create multiple notes using internal tabs and formatting.
-        • Calculator: Enter expressions and view results.
-        • Todo List: Add tasks and mark them complete.
-        • Doodle Board: Draw on the canvas and manage multiple drawings.
-        • Pomodoro: Use the timer for productivity sessions.
+        • Notepad: Create multiple notes with tabs and formatting.
+        • Calculator: Perform arithmetic calculations.
+        • Todo List: Manage tasks.
+        • Doodle Board: Draw and manage multiple drawings.
+        • Stopwatch: Start/stop/reset a timer.
+        • Unit Converter: Convert between kilometers and miles.
+        • BMI Calculator: Calculate Body Mass Index.
+        • Tip Calculator: Calculate tip and total bill.
   Enjoy your Device Connector experience!
   ===============================
   -->
