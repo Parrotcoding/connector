@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Try Galaxy Mimic Enhanced Notepad & QR Fixes</title>
+  <title>Try Galaxy Mimic with Compressed Connection Codes</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     #connection-section, #apps-section { margin-bottom: 20px; }
@@ -12,31 +12,25 @@
     #app-tabs li:hover { background: #ddd; }
     #ttt-board td { border: 1px solid #000; width: 60px; height: 60px; text-align: center; font-size: 24px; cursor: pointer; }
     #chat-window { border: 1px solid #ccc; height: 200px; overflow: auto; margin-bottom: 10px; padding: 5px; }
-    #qr-code { margin-bottom: 10px; }
-    #qr-scanner { width: 300px; height: 300px; margin-top: 10px; }
     #notepad-toolbar { margin-bottom: 5px; }
     #notepad-area { width: 100%; height: 200px; border: 1px solid #ccc; padding: 5px; overflow: auto; }
   </style>
 </head>
 <body>
-  <h1>Try Galaxy Mimic Enhanced Notepad & QR Fixes</h1>
+  <h1>Try Galaxy Mimic with Compressed Connection Codes</h1>
   <div id="connection-section">
     <button id="create-session-btn">Create Session (Initiator)</button>
     <button id="join-session-btn">Join Session (Receiver)</button>
     <div id="signal-section" style="display:none;">
       <p id="signal-instructions">
-        <strong>Step 1:</strong> Copy the generated code and/or use the QR code below, then share it with your peer.
+        <strong>Step 1:</strong> Copy the compressed code below and send it to your peer.
       </p>
-      <textarea id="signal-output" placeholder="Signal code will appear here..." readonly></textarea>
-      <div id="qr-code"></div>
+      <textarea id="signal-output" placeholder="Compressed signal code will appear here..." readonly></textarea>
       <p id="signal-paste">
-        <strong>Step 2:</strong> Paste your peer's code below or use the QR scanner.
+        <strong>Step 2:</strong> Paste your peer's compressed code below.
       </p>
       <textarea id="signal-input" placeholder="Paste remote signal code here"></textarea>
       <button id="submit-signal-btn">Submit Signal</button>
-      <br>
-      <button id="scan-qr-btn">Scan QR Code</button>
-      <div id="qr-scanner" style="display:none;"></div>
     </div>
   </div>
 
@@ -54,15 +48,13 @@
 
   <!-- Include SimplePeer from CDN -->
   <script src="https://unpkg.com/simple-peer/simplepeer.min.js"></script>
-  <!-- Include QRCode.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- Include html5-qrcode library -->
-  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+  <!-- Include LZ-String library for compression -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
   <script>
     let peer;
     let currentRole = ""; // "initiator" or "receiver"
-    let chatHistory = [];         // Persist chat messages
-    let notepadContent = "";      // Persist notepad content
+    let chatHistory = [];    // Persist chat messages
+    let notepadContent = ""; // Persist notepad content
 
     const createSessionBtn = document.getElementById("create-session-btn");
     const joinSessionBtn = document.getElementById("join-session-btn");
@@ -73,11 +65,6 @@
     const appsSection = document.getElementById("apps-section");
     const appTabs = document.getElementById("app-tabs");
     const appContainer = document.getElementById("app-container");
-    const qrCodeDiv = document.getElementById("qr-code");
-    const scanQRBtn = document.getElementById("scan-qr-btn");
-    const qrScannerDiv = document.getElementById("qr-scanner");
-    let html5QrcodeScanner = null;
-    let qrScannerInitialized = false;
 
     createSessionBtn.addEventListener("click", () => {
       currentRole = "initiator";
@@ -94,56 +81,21 @@
     });
 
     submitSignalBtn.addEventListener("click", () => {
-      const remoteSignal = signalInput.value;
+      const compressedInput = signalInput.value;
+      // Decompress the received signal code
+      const decompressedSignal = LZString.decompressFromEncodedURIComponent(compressedInput);
       try {
-        const signalData = JSON.parse(remoteSignal);
+        const signalData = JSON.parse(decompressedSignal);
         console.log("Submitting remote signal:", signalData);
         peer.signal(signalData);
       } catch (e) {
-        alert("Invalid signal data. Please ensure the code is copied correctly.");
+        alert("Invalid signal data. Please ensure the code is correct.");
       }
     });
 
-    // QR code scanning functionality
-    scanQRBtn.addEventListener("click", () => {
-      qrScannerDiv.style.display = "block";
-      if (!qrScannerInitialized) {
-        html5QrcodeScanner = new Html5QrcodeScanner("qr-scanner", { fps: 15, qrbox: { width: 300, height: 300 }}, false);
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-        qrScannerInitialized = true;
-      } else {
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-      }
-    });
-
-    function onScanSuccess(decodedText, decodedResult) {
-      console.log(`QR code scanned: ${decodedText}`);
-      signalInput.value = decodedText;
-      alert("QR Code scanned. Remote signal data filled.");
-      if (html5QrcodeScanner) {
-        html5QrcodeScanner.clear().then(_ => {
-          qrScannerDiv.innerHTML = "";
-          qrScannerDiv.style.display = "none";
-          qrScannerInitialized = false;
-        }).catch(error => {
-          console.error("Failed to clear QR scanner.", error);
-        });
-      }
-    }
-
-    function onScanFailure(error) {
-      console.warn(`QR code scan error: ${error}`);
-    }
-
-    // Generate a QR code for the local signal data
-    function generateQRCode(text) {
-      qrCodeDiv.innerHTML = "";
-      new QRCode(qrCodeDiv, {
-        text: text,
-        width: 256,
-        height: 256,
-        correctLevel: QRCode.CorrectLevel.H
-      });
+    // Compress the signal JSON to a shorter string
+    function compressSignal(text) {
+      return LZString.compressToEncodedURIComponent(text);
     }
 
     // Initialize the SimplePeer connection
@@ -153,8 +105,8 @@
       peer.on('signal', data => {
         console.log("Local signal data generated:", data);
         const signalString = JSON.stringify(data);
-        signalOutput.value = signalString;
-        generateQRCode(signalString);
+        const compressedSignal = compressSignal(signalString);
+        signalOutput.value = compressedSignal;
       });
 
       peer.on('connect', () => {
@@ -223,7 +175,7 @@
         renderChatHistory();
         document.getElementById("chat-send-btn").addEventListener("click", () => {
           const message = document.getElementById("chat-input").value;
-          if(message.trim() !== ""){
+          if (message.trim() !== "") {
             appendChatMessage("You: " + message);
             sendData("chat", message);
             document.getElementById("chat-input").value = "";
