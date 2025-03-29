@@ -37,18 +37,18 @@ header {
   padding: 15px;
 }
 
+/* Pill-shaped buttons */
 button {
   background: #4a90e2;
   color: #fff;
   border: none;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 50px;
   margin: 5px 0;
   cursor: pointer;
   font-size: 14px;
   width: 100%;
 }
-
 button:hover {
   background: #357ab7;
 }
@@ -64,39 +64,45 @@ select {
   border-radius: 4px;
 }
 
-#app-tabs {
-  display: flex;
+/* Home Screen Grid */
+#home-screen {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 15px;
+}
+.home-icon {
   background: #f0f0f0;
-  border-bottom: 1px solid #ccc;
-}
-
-#app-tabs li {
-  flex: 1;
-  text-align: center;
   padding: 10px;
+  text-align: center;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  transition: background 0.2s;
 }
-
-#app-tabs li:hover {
+.home-icon:hover {
   background: #e0e0e0;
 }
-
-#app-tabs li.active {
-  background: #fff;
-  border-bottom: 2px solid #4a90e2;
-}
-
-.app-icon {
+.home-icon .app-icon {
   margin-bottom: 5px;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
+}
+.home-icon span {
+  font-size: 13px;
 }
 
-/* Chat, Notepad, and Todo containers */
+/* App Container */
+#app-container {
+  margin-top: 10px;
+}
+
+/* Back Button */
+.back-btn {
+  width: auto;
+  margin-bottom: 10px;
+}
+
+/* Chat Window & Notepad */
 #chat-window,
 #notepad-content,
 #notepad-area,
@@ -106,19 +112,17 @@ select {
   padding: 8px;
   background: #fff;
 }
-
 #chat-window {
   height: 150px;
   overflow-y: auto;
 }
-
 #notepad-content,
 #notepad-area {
   height: 150px;
   overflow-y: auto;
 }
 
-/* Notepad internal tabs */
+/* Notepad Tabs */
 #notepad-tab-bar {
   display: flex;
   border-bottom: 1px solid #ccc;
@@ -131,6 +135,8 @@ select {
   padding: 5px;
   font-size: 12px;
   cursor: pointer;
+  border-radius: 8px;
+  margin-right: 2px;
 }
 #notepad-tab-bar button.active-note-tab {
   background: #fff;
@@ -169,7 +175,7 @@ select {
   font-size: 16px;
 }
 
-/* Doodle Board */
+/* Doodle Board Tabs */
 #doodle-tab-bar {
   display: flex;
   border-bottom: 1px solid #ccc;
@@ -182,11 +188,14 @@ select {
   padding: 5px;
   font-size: 12px;
   cursor: pointer;
+  border-radius: 8px;
+  margin-right: 2px;
 }
 #doodle-tab-bar button.active-doodle-tab {
   background: #fff;
   border-bottom: 2px solid #4a90e2;
 }
+
 canvas {
   border: 1px solid #ccc;
   width: 100%;
