@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Try Galaxy Mimic with Persistent Chat & Improved QR</title>
+  <title>Try Galaxy Mimic Enhanced Notepad & QR Fixes</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     #connection-section, #apps-section { margin-bottom: 20px; }
@@ -14,10 +14,12 @@
     #chat-window { border: 1px solid #ccc; height: 200px; overflow: auto; margin-bottom: 10px; padding: 5px; }
     #qr-code { margin-bottom: 10px; }
     #qr-scanner { width: 300px; height: 300px; margin-top: 10px; }
+    #notepad-toolbar { margin-bottom: 5px; }
+    #notepad-area { width: 100%; height: 200px; border: 1px solid #ccc; padding: 5px; overflow: auto; }
   </style>
 </head>
 <body>
-  <h1>Try Galaxy Mimic with Persistent Chat & Improved QR</h1>
+  <h1>Try Galaxy Mimic Enhanced Notepad & QR Fixes</h1>
   <div id="connection-section">
     <button id="create-session-btn">Create Session (Initiator)</button>
     <button id="join-session-btn">Join Session (Receiver)</button>
@@ -59,7 +61,8 @@
   <script>
     let peer;
     let currentRole = ""; // "initiator" or "receiver"
-    let chatHistory = []; // To persist chat messages
+    let chatHistory = [];         // Persist chat messages
+    let notepadContent = "";      // Persist notepad content
 
     const createSessionBtn = document.getElementById("create-session-btn");
     const joinSessionBtn = document.getElementById("join-session-btn");
@@ -73,6 +76,8 @@
     const qrCodeDiv = document.getElementById("qr-code");
     const scanQRBtn = document.getElementById("scan-qr-btn");
     const qrScannerDiv = document.getElementById("qr-scanner");
+    let html5QrcodeScanner = null;
+    let qrScannerInitialized = false;
 
     createSessionBtn.addEventListener("click", () => {
       currentRole = "initiator";
@@ -99,29 +104,34 @@
       }
     });
 
-    // Start the QR code scanner when the button is clicked
+    // QR code scanning functionality
     scanQRBtn.addEventListener("click", () => {
       qrScannerDiv.style.display = "block";
-      const html5QrcodeScanner = new Html5QrcodeScanner(
-        "qr-scanner", 
-        { fps: 15, qrbox: { width: 300, height: 300 } },
-        /* verbose= */ false
-      );
-      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+      if (!qrScannerInitialized) {
+        html5QrcodeScanner = new Html5QrcodeScanner("qr-scanner", { fps: 15, qrbox: { width: 300, height: 300 }}, false);
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        qrScannerInitialized = true;
+      } else {
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+      }
     });
 
-    // Callback for a successful QR code scan
     function onScanSuccess(decodedText, decodedResult) {
       console.log(`QR code scanned: ${decodedText}`);
       signalInput.value = decodedText;
       alert("QR Code scanned. Remote signal data filled.");
-      // Clear and hide the scanner
-      qrScannerDiv.innerHTML = "";
-      qrScannerDiv.style.display = "none";
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear().then(_ => {
+          qrScannerDiv.innerHTML = "";
+          qrScannerDiv.style.display = "none";
+          qrScannerInitialized = false;
+        }).catch(error => {
+          console.error("Failed to clear QR scanner.", error);
+        });
+      }
     }
 
     function onScanFailure(error) {
-      // Optionally log errors or display them
       console.warn(`QR code scan error: ${error}`);
     }
 
@@ -166,7 +176,11 @@
           if (message.app === "chat") {
             appendChatMessage("Remote: " + message.payload);
           } else if (message.app === "notepad") {
-            document.getElementById("notepad-area").value = message.payload;
+            notepadContent = message.payload;
+            const notepadArea = document.getElementById("notepad-area");
+            if (notepadArea) {
+              notepadArea.innerHTML = notepadContent;
+            }
           } else if (message.app === "tic-tac-toe") {
             handleTicTacToeMove(message.payload);
           }
@@ -206,7 +220,6 @@
           <button id="chat-send-btn">Send</button>
         `;
         appContainer.appendChild(chatDiv);
-        // Render existing chat history
         renderChatHistory();
         document.getElementById("chat-send-btn").addEventListener("click", () => {
           const message = document.getElementById("chat-input").value;
@@ -219,11 +232,26 @@
       } else if (appName === "notepad") {
         const notepadDiv = document.createElement("div");
         notepadDiv.innerHTML = `
-          <textarea id="notepad-area" style="width:100%; height:200px;" placeholder="Collaborative notepad"></textarea>
+          <div id="notepad-toolbar">
+            <button onclick="execCmd('bold')"><b>B</b></button>
+            <button onclick="execCmd('italic')"><i>I</i></button>
+            <button onclick="execCmd('underline')"><u>U</u></button>
+            Font: 
+            <select id="font-select" onchange="changeFont(this.value)">
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Verdana">Verdana</option>
+            </select>
+          </div>
+          <div id="notepad-area" contenteditable="true"></div>
         `;
         appContainer.appendChild(notepadDiv);
+        // Restore saved notepad content
+        document.getElementById("notepad-area").innerHTML = notepadContent;
         document.getElementById("notepad-area").addEventListener("input", function() {
-          sendData("notepad", this.value);
+          notepadContent = this.innerHTML;
+          sendData("notepad", notepadContent);
         });
       } else if (appName === "tic-tac-toe") {
         const tttDiv = document.createElement("div");
@@ -252,7 +280,7 @@
       }
     }
 
-    // Chat functions to persist and render chat history
+    // Chat functions
     function renderChatHistory() {
       const chatWindow = document.getElementById("chat-window");
       if (chatWindow) {
@@ -314,6 +342,14 @@
         const [a, b, c] = condition;
         return tttBoard[a] && tttBoard[a] === tttBoard[b] && tttBoard[a] === tttBoard[c];
       });
+    }
+
+    // Notepad formatting functions
+    function execCmd(cmd) {
+      document.execCommand(cmd, false, null);
+    }
+    function changeFont(font) {
+      document.execCommand('fontName', false, font);
     }
   </script>
 </body>
