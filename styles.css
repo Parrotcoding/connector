@@ -24,6 +24,16 @@ header {
   text-align: center;
 }
 
+/* Landing Page Styles */
+.landing {
+  text-align: center;
+  padding: 20px;
+}
+.landing-content p {
+  margin: 10px 0;
+}
+
+/* Home Screen Banner */
 #home-screen-banner {
   background: #ffeb3b;
   color: #333;
@@ -32,6 +42,7 @@ header {
   font-size: 13px;
 }
 
+/* Connection & Apps Section */
 #connection-section,
 #apps-section {
   padding: 15px;
@@ -53,6 +64,7 @@ button:hover {
   background: #357ab7;
 }
 
+/* Textarea, Input, Select */
 textarea,
 input,
 select {
@@ -143,22 +155,6 @@ select {
   border-bottom: 2px solid #4a90e2;
 }
 
-/* Tic Tac Toe */
-#ttt-board {
-  width: 100%;
-  max-width: 300px;
-  margin: 0 auto;
-  border-collapse: collapse;
-}
-#ttt-board td {
-  height: 60px;
-  width: 33.33%;
-  text-align: center;
-  font-size: 24px;
-  border: 1px solid #000;
-  cursor: pointer;
-}
-
 /* Calculator */
 #calc-display {
   margin-bottom: 10px;
@@ -201,4 +197,18 @@ canvas {
   width: 100%;
   height: 200px;
   border-radius: 4px;
+}
+
+/* Pomodoro Timer */
+#pomodoro-display {
+  font-size: 48px;
+  text-align: center;
+  margin: 20px 0;
+}
+#pomodoro-buttons {
+  display: flex;
+  gap: 10px;
+}
+#pomodoro-buttons button {
+  flex: 1;
 }
