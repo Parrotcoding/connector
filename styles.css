@@ -24,6 +24,14 @@ header {
   text-align: center;
 }
 
+#home-screen-banner {
+  background: #ffeb3b;
+  color: #333;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+}
+
 #connection-section,
 #apps-section {
   padding: 15px;
@@ -88,7 +96,9 @@ select {
   height: 24px;
 }
 
+/* Chat, Notepad, and Todo containers */
 #chat-window,
+#notepad-content,
 #notepad-area,
 #todo-list {
   border: 1px solid #ccc;
@@ -102,18 +112,38 @@ select {
   overflow-y: auto;
 }
 
+#notepad-content,
 #notepad-area {
   height: 150px;
   overflow-y: auto;
 }
 
+/* Notepad internal tabs */
+#notepad-tab-bar {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 5px;
+}
+#notepad-tab-bar button {
+  flex: 1;
+  background: #f0f0f0;
+  border: none;
+  padding: 5px;
+  font-size: 12px;
+  cursor: pointer;
+}
+#notepad-tab-bar button.active-note-tab {
+  background: #fff;
+  border-bottom: 2px solid #4a90e2;
+}
+
+/* Tic Tac Toe */
 #ttt-board {
   width: 100%;
   max-width: 300px;
   margin: 0 auto;
   border-collapse: collapse;
 }
-
 #ttt-board td {
   height: 60px;
   width: 33.33%;
@@ -123,23 +153,40 @@ select {
   cursor: pointer;
 }
 
+/* Calculator */
 #calc-display {
   margin-bottom: 10px;
   text-align: right;
   font-size: 18px;
 }
-
 #calc-buttons {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 5px;
 }
-
 #calc-buttons button {
   padding: 15px;
   font-size: 16px;
 }
 
+/* Doodle Board */
+#doodle-tab-bar {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 5px;
+}
+#doodle-tab-bar button {
+  flex: 1;
+  background: #f0f0f0;
+  border: none;
+  padding: 5px;
+  font-size: 12px;
+  cursor: pointer;
+}
+#doodle-tab-bar button.active-doodle-tab {
+  background: #fff;
+  border-bottom: 2px solid #4a90e2;
+}
 canvas {
   border: 1px solid #ccc;
   width: 100%;
