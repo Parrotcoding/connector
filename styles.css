@@ -24,24 +24,6 @@ header {
   text-align: center;
 }
 
-/* Landing Page Styles */
-.landing {
-  text-align: center;
-  padding: 20px;
-}
-.landing-content p {
-  margin: 10px 0;
-}
-
-/* Home Screen Banner */
-#home-screen-banner {
-  background: #ffeb3b;
-  color: #333;
-  padding: 10px;
-  text-align: center;
-  font-size: 13px;
-}
-
 /* Connection & Apps Section */
 #connection-section,
 #apps-section {
