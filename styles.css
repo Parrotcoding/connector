@@ -181,16 +181,5 @@ canvas {
   border-radius: 4px;
 }
 
-/* Pomodoro Timer */
-#pomodoro-display {
-  font-size: 48px;
-  text-align: center;
-  margin: 20px 0;
-}
-#pomodoro-buttons {
-  display: flex;
-  gap: 10px;
-}
-#pomodoro-buttons button {
-  flex: 1;
-}
+/* Additional Apps Styling */
+/* (Stopwatch, Unit Converter, BMI Calculator, Tip Calculator use basic styling) */
