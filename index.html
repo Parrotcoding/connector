@@ -2,60 +2,113 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Try Galaxy Mimic with Compressed Connection Codes</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #connection-section, #apps-section { margin-bottom: 20px; }
-    textarea { width: 100%; margin-bottom: 10px; }
-    #app-tabs { list-style: none; padding: 0; display: flex; gap: 10px; cursor: pointer; }
-    #app-tabs li { padding: 5px 10px; background: #eee; border: 1px solid #ccc; }
-    #app-tabs li:hover { background: #ddd; }
-    #ttt-board td { border: 1px solid #000; width: 60px; height: 60px; text-align: center; font-size: 24px; cursor: pointer; }
-    #chat-window { border: 1px solid #ccc; height: 200px; overflow: auto; margin-bottom: 10px; padding: 5px; }
-    #notepad-toolbar { margin-bottom: 5px; }
-    #notepad-area { width: 100%; height: 200px; border: 1px solid #ccc; padding: 5px; overflow: auto; }
-  </style>
+  <title>Try Galaxy Mimic – Mobile Edition</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Load Poppins font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>Try Galaxy Mimic with Compressed Connection Codes</h1>
-  <div id="connection-section">
-    <button id="create-session-btn">Create Session (Initiator)</button>
-    <button id="join-session-btn">Join Session (Receiver)</button>
-    <div id="signal-section" style="display:none;">
-      <p id="signal-instructions">
-        <strong>Step 1:</strong> Copy the compressed code below and send it to your peer.
-      </p>
-      <textarea id="signal-output" placeholder="Compressed signal code will appear here..." readonly></textarea>
-      <p id="signal-paste">
-        <strong>Step 2:</strong> Paste your peer's compressed code below.
-      </p>
-      <textarea id="signal-input" placeholder="Paste remote signal code here"></textarea>
-      <button id="submit-signal-btn">Submit Signal</button>
+  <div class="container">
+    <header>
+      <h1>Try Galaxy Mimic</h1>
+    </header>
+    
+    <div id="connection-section">
+      <button id="create-session-btn">Create Session (Initiator)</button>
+      <button id="join-session-btn">Join Session (Receiver)</button>
+      <div id="signal-section" style="display:none;">
+        <p id="signal-instructions">
+          <strong>Step 1:</strong> Copy the short connection code below and send it to your peer.
+        </p>
+        <textarea id="signal-output" placeholder="Short connection code will appear here..." readonly></textarea>
+        <p id="signal-paste">
+          <strong>Step 2:</strong> Paste your peer's code below.
+        </p>
+        <textarea id="signal-input" placeholder="Paste remote connection code here"></textarea>
+        <button id="submit-signal-btn">Submit Signal</button>
+      </div>
     </div>
-  </div>
 
-  <div id="apps-section" style="display:none;">
-    <h2>Mini Apps</h2>
-    <ul id="app-tabs">
-      <li data-app="chat">Chat</li>
-      <li data-app="notepad">Notepad</li>
-      <li data-app="tic-tac-toe">Tic Tac Toe</li>
-    </ul>
-    <div id="app-container">
-      <!-- App content loads here -->
+    <div id="apps-section" style="display:none;">
+      <h2>Mini‑Apps</h2>
+      <ul id="app-tabs">
+        <li data-app="chat" class="active">
+          <!-- Chat Icon -->
+          <svg class="app-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M20,2H4C2.897,2,2,2.897,2,4v16l4-4h14c1.103,0,2-0.897,2-2V4C22,2.897,21.103,2,20,2z"/>
+          </svg>
+          Chat
+        </li>
+        <li data-app="notepad">
+          <!-- Notepad Icon -->
+          <svg class="app-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M19,2H8C6.897,2,6,2.897,6,4v16c0,1.103,0.897,2,2,2h11c1.103,0,2-0.897,2-2V4C21,2.897,20.103,2,19,2z M19,20H8V4h11V20z"/>
+          </svg>
+          Notepad
+        </li>
+        <li data-app="tic-tac-toe">
+          <!-- Tic Tac Toe Icon -->
+          <svg class="app-icon" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="3" y1="11" x2="21" y2="11" stroke="currentColor" stroke-width="2"/>
+            <line x1="3" y1="17" x2="21" y2="17" stroke="currentColor" stroke-width="2"/>
+            <line x1="11" y1="3" x2="11" y2="21" stroke="currentColor" stroke-width="2"/>
+            <line x1="17" y1="3" x2="17" y2="21" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Tic Tac Toe
+        </li>
+        <li data-app="calculator">
+          <!-- Calculator Icon -->
+          <svg class="app-icon" viewBox="0 0 24 24">
+            <rect x="3" y="2" width="18" height="20" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/>
+            <rect x="7" y="6" width="10" height="3" fill="currentColor"/>
+            <line x1="7" y1="11" x2="7" y2="11" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="11" x2="12" y2="11" stroke="currentColor" stroke-width="2"/>
+            <line x1="17" y1="11" x2="17" y2="11" stroke="currentColor" stroke-width="2"/>
+            <line x1="7" y1="15" x2="7" y2="15" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="15" x2="12" y2="15" stroke="currentColor" stroke-width="2"/>
+            <line x1="17" y1="15" x2="17" y2="15" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Calculator
+        </li>
+        <li data-app="todo">
+          <!-- Todo List Icon -->
+          <svg class="app-icon" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+            <polyline fill="none" stroke="currentColor" stroke-width="2" points="8,5 9,6 11,4"/>
+          </svg>
+          Todo List
+        </li>
+        <li data-app="doodle">
+          <!-- Doodle Board Icon -->
+          <svg class="app-icon" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-width="2" d="M3 21l18-18"/>
+            <path fill="none" stroke="currentColor" stroke-width="2" d="M15 3l6 6"/>
+            <path fill="none" stroke="currentColor" stroke-width="2" d="M4 13l3 3L21 5l-3-3L4 13z"/>
+          </svg>
+          Doodle Board
+        </li>
+      </ul>
+      <div id="app-container">
+        <!-- Mini app content loads here -->
+      </div>
     </div>
   </div>
 
   <!-- Include SimplePeer from CDN -->
   <script src="https://unpkg.com/simple-peer/simplepeer.min.js"></script>
-  <!-- Include LZ-String library for compression -->
+  <!-- Include LZ-String library for shortening connection codes -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
   <script>
     let peer;
     let currentRole = ""; // "initiator" or "receiver"
-    let chatHistory = [];    // Persist chat messages
-    let notepadContent = ""; // Persist notepad content
+    let chatHistory = [];
+    let notepadContent = "";
+    let todoList = []; // Array of todo items
+    let drawing = false; // For doodle board drawing state
+    let lastX, lastY;    // For doodle board coordinates
 
+    // Get DOM elements
     const createSessionBtn = document.getElementById("create-session-btn");
     const joinSessionBtn = document.getElementById("join-session-btn");
     const signalSection = document.getElementById("signal-section");
@@ -66,102 +119,101 @@
     const appTabs = document.getElementById("app-tabs");
     const appContainer = document.getElementById("app-container");
 
+    // Session creation/joining
     createSessionBtn.addEventListener("click", () => {
       currentRole = "initiator";
-      console.log("Starting as initiator");
       startPeer(true);
       signalSection.style.display = "block";
     });
-
     joinSessionBtn.addEventListener("click", () => {
       currentRole = "receiver";
-      console.log("Starting as receiver");
       startPeer(false);
       signalSection.style.display = "block";
     });
-
     submitSignalBtn.addEventListener("click", () => {
-      const compressedInput = signalInput.value;
-      // Decompress the received signal code
-      const decompressedSignal = LZString.decompressFromEncodedURIComponent(compressedInput);
+      const shortCode = signalInput.value;
+      const decompressed = LZString.decompressFromEncodedURIComponent(shortCode);
       try {
-        const signalData = JSON.parse(decompressedSignal);
-        console.log("Submitting remote signal:", signalData);
+        const signalData = JSON.parse(decompressed);
         peer.signal(signalData);
       } catch (e) {
-        alert("Invalid signal data. Please ensure the code is correct.");
+        alert("Invalid connection code. Please ensure the code is correct.");
       }
     });
 
-    // Compress the signal JSON to a shorter string
-    function compressSignal(text) {
+    // Shorten connection signal using LZ-String
+    function shortenSignal(text) {
       return LZString.compressToEncodedURIComponent(text);
     }
 
-    // Initialize the SimplePeer connection
+    // Start SimplePeer connection
     function startPeer(isInitiator) {
       peer = new SimplePeer({ initiator: isInitiator, trickle: false });
-      
       peer.on('signal', data => {
-        console.log("Local signal data generated:", data);
         const signalString = JSON.stringify(data);
-        const compressedSignal = compressSignal(signalString);
-        signalOutput.value = compressedSignal;
+        const shortCode = shortenSignal(signalString);
+        signalOutput.value = shortCode;
       });
-
       peer.on('connect', () => {
-        console.log("Peer connection established");
         alert("Connection established!");
         document.getElementById("connection-section").style.display = "none";
         appsSection.style.display = "block";
         setupApps();
       });
-
-      peer.on('error', err => {
-        console.error("Peer error:", err);
-      });
-
+      peer.on('error', err => console.error("Peer error:", err));
       peer.on('data', data => {
         try {
           const message = JSON.parse(data);
-          console.log("Received data:", message);
-          if (message.app === "chat") {
-            appendChatMessage("Remote: " + message.payload);
-          } else if (message.app === "notepad") {
-            notepadContent = message.payload;
-            const notepadArea = document.getElementById("notepad-area");
-            if (notepadArea) {
-              notepadArea.innerHTML = notepadContent;
-            }
-          } else if (message.app === "tic-tac-toe") {
-            handleTicTacToeMove(message.payload);
+          switch (message.app) {
+            case "chat":
+              appendChatMessage("Remote: " + message.payload);
+              break;
+            case "notepad":
+              notepadContent = message.payload;
+              const notepadArea = document.getElementById("notepad-area");
+              if (notepadArea) { notepadArea.innerHTML = notepadContent; }
+              break;
+            case "tic-tac-toe":
+              handleTicTacToeMove(message.payload);
+              break;
+            case "calculator":
+              updateCalculatorDisplay(message.payload);
+              break;
+            case "todo":
+              todoList = message.payload;
+              renderTodoList();
+              break;
+            case "doodle":
+              handleDoodleData(message.payload);
+              break;
           }
         } catch (e) {
-          console.error("Error parsing incoming data", e);
+          console.error("Error parsing data:", e);
         }
       });
     }
 
-    // Send data over the peer connection
+    // Send data over the connection
     function sendData(app, payload) {
       const message = JSON.stringify({ app, payload });
       if (peer && peer.connected) {
         peer.send(message);
-      } else {
-        console.warn("Peer not connected, cannot send data");
       }
     }
 
-    // --- Mini Apps Setup ---
+    // Setup mini-app tabs
     function setupApps() {
-      appTabs.addEventListener("click", e => {
-        if (e.target && e.target.dataset.app) {
-          openApp(e.target.dataset.app);
-        }
+      Array.from(appTabs.children).forEach(tab => {
+        tab.addEventListener("click", e => {
+          Array.from(appTabs.children).forEach(t => t.classList.remove("active"));
+          e.currentTarget.classList.add("active");
+          openApp(e.currentTarget.dataset.app);
+        });
       });
       openApp("chat");
     }
 
+    // Open specific mini-app
     function openApp(appName) {
       appContainer.innerHTML = "";
       if (appName === "chat") {
@@ -199,7 +251,6 @@
           <div id="notepad-area" contenteditable="true"></div>
         `;
         appContainer.appendChild(notepadDiv);
-        // Restore saved notepad content
         document.getElementById("notepad-area").innerHTML = notepadContent;
         document.getElementById("notepad-area").addEventListener("input", function() {
           notepadContent = this.innerHTML;
@@ -208,7 +259,7 @@
       } else if (appName === "tic-tac-toe") {
         const tttDiv = document.createElement("div");
         tttDiv.innerHTML = `
-          <table id="ttt-board" style="border-collapse: collapse;">
+          <table id="ttt-board">
             <tr>
               <td data-cell="0"></td>
               <td data-cell="1"></td>
@@ -229,6 +280,82 @@
         `;
         appContainer.appendChild(tttDiv);
         initTicTacToe();
+      } else if (appName === "calculator") {
+        const calcDiv = document.createElement("div");
+        calcDiv.innerHTML = `
+          <input type="text" id="calc-display" readonly placeholder="0" />
+          <div id="calc-buttons">
+            <button data-val="7">7</button>
+            <button data-val="8">8</button>
+            <button data-val="9">9</button>
+            <button data-val="/">/</button>
+            <button data-val="4">4</button>
+            <button data-val="5">5</button>
+            <button data-val="6">6</button>
+            <button data-val="*">*</button>
+            <button data-val="1">1</button>
+            <button data-val="2">2</button>
+            <button data-val="3">3</button>
+            <button data-val="-">-</button>
+            <button data-val="0">0</button>
+            <button data-val=".">.</button>
+            <button id="calc-equals">=</button>
+            <button data-val="+">+</button>
+            <button id="calc-clear">C</button>
+          </div>
+        `;
+        appContainer.appendChild(calcDiv);
+        const display = document.getElementById("calc-display");
+        let expression = "";
+        document.querySelectorAll("#calc-buttons button").forEach(btn => {
+          btn.addEventListener("click", function() {
+            const val = this.getAttribute("data-val");
+            if (val) {
+              expression += val;
+              display.value = expression;
+              sendData("calculator", expression);
+            }
+          });
+        });
+        document.getElementById("calc-equals").addEventListener("click", () => {
+          try {
+            const result = eval(expression);
+            display.value = result;
+            expression = result.toString();
+            sendData("calculator", expression);
+          } catch (e) {
+            display.value = "Error";
+            expression = "";
+          }
+        });
+        document.getElementById("calc-clear").addEventListener("click", () => {
+          expression = "";
+          display.value = "";
+          sendData("calculator", expression);
+        });
+      } else if (appName === "todo") {
+        const todoDiv = document.createElement("div");
+        todoDiv.innerHTML = `
+          <input type="text" id="todo-input" placeholder="New task" />
+          <button id="add-todo-btn">Add Task</button>
+          <ul id="todo-list"></ul>
+        `;
+        appContainer.appendChild(todoDiv);
+        document.getElementById("add-todo-btn").addEventListener("click", () => {
+          const taskInput = document.getElementById("todo-input");
+          if (taskInput.value.trim() !== "") {
+            todoList.push({ text: taskInput.value, done: false });
+            taskInput.value = "";
+            renderTodoList();
+            sendData("todo", todoList);
+          }
+        });
+        renderTodoList();
+      } else if (appName === "doodle") {
+        const doodleDiv = document.createElement("div");
+        doodleDiv.innerHTML = `<canvas id="doodle-canvas" width="300" height="200"></canvas>`;
+        appContainer.appendChild(doodleDiv);
+        initDoodleBoard();
       }
     }
 
@@ -245,19 +372,16 @@
         chatWindow.scrollTop = chatWindow.scrollHeight;
       }
     }
-
     function appendChatMessage(msg) {
       chatHistory.push(msg);
       renderChatHistory();
     }
 
-    // --- Tic Tac Toe App ---
+    // Tic Tac Toe functions
     let tttBoard = Array(9).fill(null);
     let currentPlayer = "X";
-
     function initTicTacToe() {
-      const cells = document.querySelectorAll("#ttt-board td");
-      cells.forEach(cell => {
+      document.querySelectorAll("#ttt-board td").forEach(cell => {
         cell.addEventListener("click", function() {
           const index = parseInt(this.getAttribute("data-cell"));
           if (!tttBoard[index]) {
@@ -273,17 +397,13 @@
         });
       });
     }
-
     function handleTicTacToeMove(move) {
       if (typeof move.index === "number" && move.player) {
         tttBoard[move.index] = move.player;
         const cell = document.querySelector("#ttt-board td[data-cell='" + move.index + "']");
-        if (cell) {
-          cell.textContent = move.player;
-        }
+        if (cell) { cell.textContent = move.player; }
       }
     }
-
     function checkWin() {
       const winConditions = [
         [0,1,2],[3,4,5],[6,7,8],
@@ -296,6 +416,86 @@
       });
     }
 
+    // Calculator functions
+    function updateCalculatorDisplay(expr) {
+      const display = document.getElementById("calc-display");
+      if (display) { display.value = expr; }
+    }
+
+    // Todo List functions
+    function renderTodoList() {
+      const todoUl = document.getElementById("todo-list");
+      if (todoUl) {
+        todoUl.innerHTML = "";
+        todoList.forEach((task, index) => {
+          const li = document.createElement("li");
+          li.textContent = task.text;
+          li.style.textDecoration = task.done ? "line-through" : "none";
+          li.addEventListener("click", () => {
+            todoList[index].done = !todoList[index].done;
+            renderTodoList();
+            sendData("todo", todoList);
+          });
+          todoUl.appendChild(li);
+        });
+      }
+    }
+
+    // Doodle Board functions
+    function initDoodleBoard() {
+      const canvas = document.getElementById("doodle-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.addEventListener("mousedown", (e) => {
+        drawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+      });
+      canvas.addEventListener("mousemove", (e) => {
+        if (!drawing) return;
+        const [x, y] = [e.offsetX, e.offsetY];
+        drawLine(ctx, lastX, lastY, x, y);
+        sendData("doodle", { from: {x: lastX, y: lastY}, to: {x, y} });
+        [lastX, lastY] = [x, y];
+      });
+      canvas.addEventListener("mouseup", () => drawing = false);
+      canvas.addEventListener("mouseout", () => drawing = false);
+      // For touch devices
+      canvas.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        drawing = true;
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        lastX = touch.clientX - rect.left;
+        lastY = touch.clientY - rect.top;
+      });
+      canvas.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        if (!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        drawLine(ctx, lastX, lastY, x, y);
+        sendData("doodle", { from: {x: lastX, y: lastY}, to: {x, y} });
+        lastX = x; lastY = y;
+      });
+      canvas.addEventListener("touchend", () => drawing = false);
+    }
+    function drawLine(ctx, x1, y1, x2, y2) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    function handleDoodleData(payload) {
+      const canvas = document.getElementById("doodle-canvas");
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        drawLine(ctx, payload.from.x, payload.from.y, payload.to.x, payload.to.y);
+      }
+    }
+
     // Notepad formatting functions
     function execCmd(cmd) {
       document.execCommand(cmd, false, null);
@@ -304,5 +504,23 @@
       document.execCommand('fontName', false, font);
     }
   </script>
+
+  <!--
+  ===============================
+  Guide & Instructions
+  ===============================
+  1. Launch the app on two devices by serving this file via HTTPS or on localhost (e.g., using "python -m http.server").
+  2. On one device, click "Create Session (Initiator)" to generate a short connection code. Copy the code and send it to your peer.
+  3. On the other device, click "Join Session (Receiver)", paste the received connection code, and click "Submit Signal" to establish the connection.
+  4. Once connected, the mini‑apps interface will appear. Switch between apps using the tabs at the top.
+     - Chat: Send messages that appear on both devices.
+     - Notepad: Create and format notes; changes are shared.
+     - Tic Tac Toe: Play a simple game.
+     - Calculator: Perform calculations; the expression is synchronized.
+     - Todo List: Add tasks and mark them complete; the list is shared.
+     - Doodle Board: Draw on the canvas; your strokes will be sent to your peer.
+  Enjoy the experience!
+  ===============================
+  -->
 </body>
 </html>
