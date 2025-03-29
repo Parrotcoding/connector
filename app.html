@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Device Connector</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="styles.css">
@@ -98,8 +98,7 @@
     let drawings = [];
     let currentDrawingIndex = 0;
     let todoList = [];
-    // Pomodoro timer variables (in seconds)
-    let pomodoroTime = 1500; // 25 minutes
+    let pomodoroTime = 1500; // 25 minutes (in seconds)
     let pomodoroInterval = null;
 
     /* DOM Elements */
@@ -545,12 +544,11 @@
       document.getElementById("pomodoro-reset").addEventListener("click", resetPomodoro);
     }
     function startPomodoro() {
-      if (pomodoroInterval) return; // already running
+      if (pomodoroInterval) return;
       pomodoroInterval = setInterval(() => {
         if (pomodoroTime > 0) {
           pomodoroTime--;
           updatePomodoroDisplay(formatTime(pomodoroTime));
-          // Optionally, send the timer value over the connection:
           sendData("pomodoro", formatTime(pomodoroTime));
         } else {
           clearInterval(pomodoroInterval);
@@ -571,9 +569,7 @@
     }
     function updatePomodoroDisplay(text) {
       const display = document.getElementById("pomodoro-display");
-      if (display) {
-        display.textContent = text;
-      }
+      if (display) { display.textContent = text; }
     }
     function formatTime(seconds) {
       const m = Math.floor(seconds / 60);
@@ -600,18 +596,18 @@
      - Serve these files via HTTPS or on localhost (e.g., using "python -m http.server").
      - Open index.html on a device.
      - For best experience, add Device Connector to your Home Screen.
-  2. In Browser Mode:
-     - You’ll see a landing page instructing you to add the app to your Home Screen.
-     - Click "Enter App" to proceed (or add to Home Screen for full app mode).
+  2. Landing Page:
+     - In browser mode, you’ll see instructions to add the app to your Home Screen.
+     - In standalone mode, the app automatically opens in full screen.
   3. In App Mode:
-     - Establish a connection by creating or joining a session.
-     - After connection, you will see a home screen with app icons.
+     - Establish a connection by creating or joining a session (connection codes are shortened).
+     - After connecting, a home screen grid of app icons is displayed.
      - Tap an icon to open that mini‑app. Use the "Home" button to return.
         • Chat: Exchange messages.
         • Notepad: Create multiple notes using internal tabs and formatting.
         • Calculator: Enter expressions and view results.
         • Todo List: Add tasks and mark them complete.
-        • Doodle Board: Draw and manage multiple drawings.
+        • Doodle Board: Draw on the canvas and manage multiple drawings.
         • Pomodoro: Use the timer for productivity sessions.
   Enjoy your Device Connector experience!
   ===============================
