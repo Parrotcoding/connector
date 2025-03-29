@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Try Galaxy Mimic with QR Codes</title>
+  <title>Try Galaxy Mimic with Persistent Chat & Improved QR</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     #connection-section, #apps-section { margin-bottom: 20px; }
@@ -17,7 +17,7 @@
   </style>
 </head>
 <body>
-  <h1>Try Galaxy Mimic with QR Codes</h1>
+  <h1>Try Galaxy Mimic with Persistent Chat & Improved QR</h1>
   <div id="connection-section">
     <button id="create-session-btn">Create Session (Initiator)</button>
     <button id="join-session-btn">Join Session (Receiver)</button>
@@ -59,6 +59,7 @@
   <script>
     let peer;
     let currentRole = ""; // "initiator" or "receiver"
+    let chatHistory = []; // To persist chat messages
 
     const createSessionBtn = document.getElementById("create-session-btn");
     const joinSessionBtn = document.getElementById("join-session-btn");
@@ -101,7 +102,11 @@
     // Start the QR code scanner when the button is clicked
     scanQRBtn.addEventListener("click", () => {
       qrScannerDiv.style.display = "block";
-      const html5QrcodeScanner = new Html5QrcodeScanner("qr-scanner", { fps: 10, qrbox: 250 });
+      const html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-scanner", 
+        { fps: 15, qrbox: { width: 300, height: 300 } },
+        /* verbose= */ false
+      );
       html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     });
 
@@ -110,12 +115,13 @@
       console.log(`QR code scanned: ${decodedText}`);
       signalInput.value = decodedText;
       alert("QR Code scanned. Remote signal data filled.");
+      // Clear and hide the scanner
       qrScannerDiv.innerHTML = "";
       qrScannerDiv.style.display = "none";
     }
 
     function onScanFailure(error) {
-      // You can choose to ignore scan failures or log them
+      // Optionally log errors or display them
       console.warn(`QR code scan error: ${error}`);
     }
 
@@ -124,8 +130,9 @@
       qrCodeDiv.innerHTML = "";
       new QRCode(qrCodeDiv, {
         text: text,
-        width: 128,
-        height: 128
+        width: 256,
+        height: 256,
+        correctLevel: QRCode.CorrectLevel.H
       });
     }
 
@@ -199,11 +206,15 @@
           <button id="chat-send-btn">Send</button>
         `;
         appContainer.appendChild(chatDiv);
+        // Render existing chat history
+        renderChatHistory();
         document.getElementById("chat-send-btn").addEventListener("click", () => {
           const message = document.getElementById("chat-input").value;
-          appendChatMessage("You: " + message);
-          sendData("chat", message);
-          document.getElementById("chat-input").value = "";
+          if(message.trim() !== ""){
+            appendChatMessage("You: " + message);
+            sendData("chat", message);
+            document.getElementById("chat-input").value = "";
+          }
         });
       } else if (appName === "notepad") {
         const notepadDiv = document.createElement("div");
@@ -241,14 +252,26 @@
       }
     }
 
-    function appendChatMessage(msg) {
+    // Chat functions to persist and render chat history
+    function renderChatHistory() {
       const chatWindow = document.getElementById("chat-window");
-      const p = document.createElement("p");
-      p.textContent = msg;
-      chatWindow.appendChild(p);
-      chatWindow.scrollTop = chatWindow.scrollHeight;
+      if (chatWindow) {
+        chatWindow.innerHTML = "";
+        chatHistory.forEach(msg => {
+          const p = document.createElement("p");
+          p.textContent = msg;
+          chatWindow.appendChild(p);
+        });
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
     }
 
+    function appendChatMessage(msg) {
+      chatHistory.push(msg);
+      renderChatHistory();
+    }
+
+    // --- Tic Tac Toe App ---
     let tttBoard = Array(9).fill(null);
     let currentPlayer = "X";
 
