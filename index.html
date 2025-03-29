@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Try Galaxy Mimic</title>
+  <title>Try Galaxy Mimic with QR Codes</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     #connection-section, #apps-section { margin-bottom: 20px; }
@@ -12,19 +12,29 @@
     #app-tabs li:hover { background: #ddd; }
     #ttt-board td { border: 1px solid #000; width: 60px; height: 60px; text-align: center; font-size: 24px; cursor: pointer; }
     #chat-window { border: 1px solid #ccc; height: 200px; overflow: auto; margin-bottom: 10px; padding: 5px; }
+    #qr-code { margin-bottom: 10px; }
+    #qr-scanner { width: 300px; height: 300px; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <h1>Try Galaxy Mimic</h1>
+  <h1>Try Galaxy Mimic with QR Codes</h1>
   <div id="connection-section">
     <button id="create-session-btn">Create Session (Initiator)</button>
     <button id="join-session-btn">Join Session (Receiver)</button>
     <div id="signal-section" style="display:none;">
-      <p id="signal-instructions"><strong>Step 1:</strong> Copy the generated code and share it with your peer.</p>
+      <p id="signal-instructions">
+        <strong>Step 1:</strong> Copy the generated code and/or use the QR code below, then share it with your peer.
+      </p>
       <textarea id="signal-output" placeholder="Signal code will appear here..." readonly></textarea>
-      <p id="signal-paste"><strong>Step 2:</strong> Paste your peer's code below:</p>
+      <div id="qr-code"></div>
+      <p id="signal-paste">
+        <strong>Step 2:</strong> Paste your peer's code below or use the QR scanner.
+      </p>
       <textarea id="signal-input" placeholder="Paste remote signal code here"></textarea>
       <button id="submit-signal-btn">Submit Signal</button>
+      <br>
+      <button id="scan-qr-btn">Scan QR Code</button>
+      <div id="qr-scanner" style="display:none;"></div>
     </div>
   </div>
 
@@ -42,6 +52,10 @@
 
   <!-- Include SimplePeer from CDN -->
   <script src="https://unpkg.com/simple-peer/simplepeer.min.js"></script>
+  <!-- Include QRCode.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Include html5-qrcode library -->
+  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
   <script>
     let peer;
     let currentRole = ""; // "initiator" or "receiver"
@@ -55,6 +69,9 @@
     const appsSection = document.getElementById("apps-section");
     const appTabs = document.getElementById("app-tabs");
     const appContainer = document.getElementById("app-container");
+    const qrCodeDiv = document.getElementById("qr-code");
+    const scanQRBtn = document.getElementById("scan-qr-btn");
+    const qrScannerDiv = document.getElementById("qr-scanner");
 
     createSessionBtn.addEventListener("click", () => {
       currentRole = "initiator";
@@ -81,12 +98,46 @@
       }
     });
 
+    // Start the QR code scanner when the button is clicked
+    scanQRBtn.addEventListener("click", () => {
+      qrScannerDiv.style.display = "block";
+      const html5QrcodeScanner = new Html5QrcodeScanner("qr-scanner", { fps: 10, qrbox: 250 });
+      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    });
+
+    // Callback for a successful QR code scan
+    function onScanSuccess(decodedText, decodedResult) {
+      console.log(`QR code scanned: ${decodedText}`);
+      signalInput.value = decodedText;
+      alert("QR Code scanned. Remote signal data filled.");
+      qrScannerDiv.innerHTML = "";
+      qrScannerDiv.style.display = "none";
+    }
+
+    function onScanFailure(error) {
+      // You can choose to ignore scan failures or log them
+      console.warn(`QR code scan error: ${error}`);
+    }
+
+    // Generate a QR code for the local signal data
+    function generateQRCode(text) {
+      qrCodeDiv.innerHTML = "";
+      new QRCode(qrCodeDiv, {
+        text: text,
+        width: 128,
+        height: 128
+      });
+    }
+
+    // Initialize the SimplePeer connection
     function startPeer(isInitiator) {
       peer = new SimplePeer({ initiator: isInitiator, trickle: false });
       
       peer.on('signal', data => {
         console.log("Local signal data generated:", data);
-        signalOutput.value = JSON.stringify(data);
+        const signalString = JSON.stringify(data);
+        signalOutput.value = signalString;
+        generateQRCode(signalString);
       });
 
       peer.on('connect', () => {
@@ -118,6 +169,7 @@
       });
     }
 
+    // Send data over the peer connection
     function sendData(app, payload) {
       const message = JSON.stringify({ app, payload });
       if (peer && peer.connected) {
@@ -127,6 +179,7 @@
       }
     }
 
+    // --- Mini Apps Setup ---
     function setupApps() {
       appTabs.addEventListener("click", e => {
         if (e.target && e.target.dataset.app) {
