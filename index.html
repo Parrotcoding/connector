@@ -16,15 +16,15 @@
       <h1>Device Connector</h1>
     </header>
 
-    <!-- Banner instructing user to add to home screen -->
+    <!-- Banner: Add to Home Screen for best experience -->
     <div id="home-screen-banner">
       For best experience, add Device Connector to your Home Screen.
     </div>
 
     <!-- Connection Section -->
     <div id="connection-section">
-      <button id="create-session-btn">Create Session (Initiator)</button>
-      <button id="join-session-btn">Join Session (Receiver)</button>
+      <button id="create-session-btn" class="pill-btn">Create Session (Initiator)</button>
+      <button id="join-session-btn" class="pill-btn">Join Session (Receiver)</button>
       <div id="signal-section" style="display:none;">
         <p id="signal-instructions">
           <strong>Step 1:</strong> Copy the short connection code below and send it to your peer.
@@ -34,30 +34,27 @@
           <strong>Step 2:</strong> Paste your peer's code below.
         </p>
         <textarea id="signal-input" placeholder="Paste remote connection code here"></textarea>
-        <button id="submit-signal-btn">Submit Signal</button>
+        <button id="submit-signal-btn" class="pill-btn">Submit Signal</button>
       </div>
     </div>
 
-    <!-- Mini‑Apps Section -->
+    <!-- Apps Section (Home Screen + App View) -->
     <div id="apps-section" style="display:none;">
-      <h2>Mini‑Apps</h2>
-      <ul id="app-tabs">
-        <li data-app="chat" class="active">
-          <!-- Chat Icon -->
+      <!-- Home Screen: a grid of app icons -->
+      <div id="home-screen">
+        <div class="home-icon" data-app="chat">
           <svg class="app-icon" viewBox="0 0 24 24">
             <path fill="currentColor" d="M20,2H4C2.897,2,2,2.897,2,4v16l4-4h14c1.103,0,2-0.897,2-2V4C22,2.897,21.103,2,20,2z"/>
           </svg>
-          Chat
-        </li>
-        <li data-app="notepad">
-          <!-- Notepad Icon -->
+          <span>Chat</span>
+        </div>
+        <div class="home-icon" data-app="notepad">
           <svg class="app-icon" viewBox="0 0 24 24">
             <path fill="currentColor" d="M19,2H8C6.897,2,6,2.897,6,4v16c0,1.103,0.897,2,2,2h11c1.103,0,2-0.897,2-2V4C21,2.897,20.103,2,19,2z M19,20H8V4h11V20z"/>
           </svg>
-          Notepad
-        </li>
-        <li data-app="tic-tac-toe">
-          <!-- Tic Tac Toe Icon -->
+          <span>Notepad</span>
+        </div>
+        <div class="home-icon" data-app="tic-tac-toe">
           <svg class="app-icon" viewBox="0 0 24 24">
             <rect x="3" y="3" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"/>
             <line x1="3" y1="11" x2="21" y2="11" stroke="currentColor" stroke-width="2"/>
@@ -65,69 +62,55 @@
             <line x1="11" y1="3" x2="11" y2="21" stroke="currentColor" stroke-width="2"/>
             <line x1="17" y1="3" x2="17" y2="21" stroke="currentColor" stroke-width="2"/>
           </svg>
-          Tic Tac Toe
-        </li>
-        <li data-app="calculator">
-          <!-- Calculator Icon -->
+          <span>Tic Tac Toe</span>
+        </div>
+        <div class="home-icon" data-app="calculator">
           <svg class="app-icon" viewBox="0 0 24 24">
             <rect x="3" y="2" width="18" height="20" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/>
             <rect x="7" y="6" width="10" height="3" fill="currentColor"/>
-            <line x1="7" y1="11" x2="7" y2="11" stroke="currentColor" stroke-width="2"/>
-            <line x1="12" y1="11" x2="12" y2="11" stroke="currentColor" stroke-width="2"/>
-            <line x1="17" y1="11" x2="17" y2="11" stroke="currentColor" stroke-width="2"/>
-            <line x1="7" y1="15" x2="7" y2="15" stroke="currentColor" stroke-width="2"/>
-            <line x1="12" y1="15" x2="12" y2="15" stroke="currentColor" stroke-width="2"/>
-            <line x1="17" y1="15" x2="17" y2="15" stroke="currentColor" stroke-width="2"/>
           </svg>
-          Calculator
-        </li>
-        <li data-app="todo">
-          <!-- Todo List Icon -->
+          <span>Calculator</span>
+        </div>
+        <div class="home-icon" data-app="todo">
           <svg class="app-icon" viewBox="0 0 24 24">
             <path fill="none" stroke="currentColor" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
             <polyline fill="none" stroke="currentColor" stroke-width="2" points="8,5 9,6 11,4"/>
           </svg>
-          Todo List
-        </li>
-        <li data-app="doodle">
-          <!-- Doodle Board Icon -->
+          <span>Todo List</span>
+        </div>
+        <div class="home-icon" data-app="doodle">
           <svg class="app-icon" viewBox="0 0 24 24">
             <path fill="none" stroke="currentColor" stroke-width="2" d="M3 21l18-18"/>
             <path fill="none" stroke="currentColor" stroke-width="2" d="M15 3l6 6"/>
             <path fill="none" stroke="currentColor" stroke-width="2" d="M4 13l3 3L21 5l-3-3L4 13z"/>
           </svg>
-          Doodle Board
-        </li>
-      </ul>
-      <div id="app-container">
-        <!-- Mini-app content loads here -->
+          <span>Doodle Board</span>
+        </div>
       </div>
+      <!-- App Container: content for individual apps will load here -->
+      <div id="app-container" style="display:none;"></div>
     </div>
   </div>
 
-  <!-- Include SimplePeer from CDN -->
+  <!-- Include SimplePeer and LZ-String from CDN -->
   <script src="https://unpkg.com/simple-peer/simplepeer.min.js"></script>
-  <!-- Include LZ-String library for shortening connection codes -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
   <script>
-    /* ============================
+    /* ------------------------------
        Global Variables & Data Storage
-       ============================ */
+       ------------------------------ */
     let peer;
     let currentRole = ""; // "initiator" or "receiver"
     let chatHistory = [];
-    // Notepad data: an array of note objects
     let notes = [{ title: "Note 1", content: "" }];
     let currentNoteIndex = 0;
-    // Doodle data: an array of drawing tabs (each drawing is stored as a data URL)
-    let drawings = [];
+    let drawings = []; // Each drawing stored as a data URL
     let currentDrawingIndex = 0;
-    // Other apps data
     let todoList = [];
 
-    /* ============================
+    /* ------------------------------
        DOM Elements
-       ============================ */
+       ------------------------------ */
     const createSessionBtn = document.getElementById("create-session-btn");
     const joinSessionBtn = document.getElementById("join-session-btn");
     const signalSection = document.getElementById("signal-section");
@@ -135,12 +118,12 @@
     const signalInput = document.getElementById("signal-input");
     const submitSignalBtn = document.getElementById("submit-signal-btn");
     const appsSection = document.getElementById("apps-section");
-    const appTabs = document.getElementById("app-tabs");
+    const homeScreen = document.getElementById("home-screen");
     const appContainer = document.getElementById("app-container");
 
-    /* ============================
-       Connection & Signaling
-       ============================ */
+    /* ------------------------------
+       Connection & Signaling (using LZString)
+       ------------------------------ */
     createSessionBtn.addEventListener("click", () => {
       currentRole = "initiator";
       startPeer(true);
@@ -153,8 +136,8 @@
     });
     submitSignalBtn.addEventListener("click", () => {
       const shortCode = signalInput.value;
-      // Decompress using UTF16 variant
-      const decompressed = LZString.decompressFromUTF16(shortCode);
+      // Decompress using LZString (encoded URI variant)
+      const decompressed = LZString.decompressFromEncodedURIComponent(shortCode);
       try {
         const signalData = JSON.parse(decompressed);
         peer.signal(signalData);
@@ -162,9 +145,8 @@
         alert("Invalid connection code. Please ensure the code is correct.");
       }
     });
-    // Shorten connection signal using LZ-String's UTF16 methods
     function shortenSignal(text) {
-      return LZString.compressToUTF16(text);
+      return LZString.compressToEncodedURIComponent(text);
     }
     function startPeer(isInitiator) {
       peer = new SimplePeer({ initiator: isInitiator, trickle: false });
@@ -177,7 +159,7 @@
         alert("Connection established!");
         document.getElementById("connection-section").style.display = "none";
         appsSection.style.display = "block";
-        setupApps();
+        showHomeScreen();
       });
       peer.on('error', err => console.error("Peer error:", err));
       peer.on('data', data => {
@@ -188,7 +170,6 @@
               appendChatMessage("Remote: " + message.payload);
               break;
             case "notepad":
-              // Expecting an array of notes
               notes = message.payload;
               renderNotepadTabs();
               renderNotepadContent();
@@ -219,21 +200,18 @@
       }
     }
 
-    /* ============================
-       Mini‑Apps Setup & Tab Navigation
-       ============================ */
-    function setupApps() {
-      Array.from(appTabs.children).forEach(tab => {
-        tab.addEventListener("click", e => {
-          Array.from(appTabs.children).forEach(t => t.classList.remove("active"));
-          e.currentTarget.classList.add("active");
-          openApp(e.currentTarget.dataset.app);
-        });
-      });
-      openApp("chat");
+    /* ------------------------------
+       Home Screen Navigation
+       ------------------------------ */
+    function showHomeScreen() {
+      homeScreen.style.display = "grid";
+      appContainer.style.display = "none";
     }
     function openApp(appName) {
-      appContainer.innerHTML = "";
+      homeScreen.style.display = "none";
+      appContainer.style.display = "block";
+      // Insert a "Home" back button at the top of the app container
+      appContainer.innerHTML = `<button class="pill-btn back-btn" onclick="showHomeScreen()">Home</button>`;
       if (appName === "chat") {
         openChatApp();
       } else if (appName === "notepad") {
@@ -248,18 +226,24 @@
         openDoodleApp();
       }
     }
+    // Set up home screen icon clicks
+    document.querySelectorAll(".home-icon").forEach(icon => {
+      icon.addEventListener("click", function() {
+        openApp(this.dataset.app);
+      });
+    });
 
-    /* ============================
+    /* ------------------------------
        Chat App
-       ============================ */
+       ------------------------------ */
     function openChatApp() {
       const chatDiv = document.createElement("div");
       chatDiv.innerHTML = `
         <div id="chat-window"></div>
         <input type="text" id="chat-input" placeholder="Type a message" />
-        <button id="chat-send-btn">Send</button>
+        <button id="chat-send-btn" class="pill-btn">Send</button>
       `;
-      appContainer.appendChild(chatDiv);
+      appContainer.innerHTML += chatDiv.outerHTML;
       renderChatHistory();
       document.getElementById("chat-send-btn").addEventListener("click", () => {
         const message = document.getElementById("chat-input").value;
@@ -287,17 +271,17 @@
       renderChatHistory();
     }
 
-    /* ============================
+    /* ------------------------------
        Notepad App with Tabs
-       ============================ */
+       ------------------------------ */
     function openNotepadApp() {
       const notepadDiv = document.createElement("div");
       notepadDiv.innerHTML = `
         <div id="notepad-tab-bar"></div>
-        <button id="add-note-btn">Add Note</button>
+        <button id="add-note-btn" class="pill-btn">Add Note</button>
         <div id="notepad-content" contenteditable="true"></div>
       `;
-      appContainer.appendChild(notepadDiv);
+      appContainer.innerHTML += notepadDiv.outerHTML;
       renderNotepadTabs();
       renderNotepadContent();
       document.getElementById("notepad-content").addEventListener("input", function() {
@@ -335,9 +319,9 @@
       }
     }
 
-    /* ============================
+    /* ------------------------------
        Tic Tac Toe App
-       ============================ */
+       ------------------------------ */
     function openTicTacToeApp() {
       const tttDiv = document.createElement("div");
       tttDiv.innerHTML = `
@@ -360,7 +344,7 @@
         </table>
         <p id="ttt-status"></p>
       `;
-      appContainer.appendChild(tttDiv);
+      appContainer.innerHTML += tttDiv.outerHTML;
       initTicTacToe();
     }
     let tttBoard = Array(9).fill(null);
@@ -376,7 +360,7 @@
             if (checkWin()) {
               document.getElementById("ttt-status").textContent = currentPlayer + " wins!";
             } else {
-              currentPlayer = currentPlayer === "X" ? "O" : "X";
+              currentPlayer = (currentPlayer === "X") ? "O" : "X";
             }
           }
         });
@@ -397,38 +381,38 @@
       ];
       return winConditions.some(condition => {
         const [a, b, c] = condition;
-        return tttBoard[a] && tttBoard[a] === tttBoard[b] && tttBoard[a] === tttBoard[c];
+        return tttBoard[a] && (tttBoard[a] === tttBoard[b] && tttBoard[a] === tttBoard[c]);
       });
     }
 
-    /* ============================
+    /* ------------------------------
        Calculator App
-       ============================ */
+       ------------------------------ */
     function openCalculatorApp() {
       const calcDiv = document.createElement("div");
       calcDiv.innerHTML = `
         <input type="text" id="calc-display" readonly placeholder="0" />
         <div id="calc-buttons">
-          <button data-val="7">7</button>
-          <button data-val="8">8</button>
-          <button data-val="9">9</button>
-          <button data-val="/">/</button>
-          <button data-val="4">4</button>
-          <button data-val="5">5</button>
-          <button data-val="6">6</button>
-          <button data-val="*">*</button>
-          <button data-val="1">1</button>
-          <button data-val="2">2</button>
-          <button data-val="3">3</button>
-          <button data-val="-">-</button>
-          <button data-val="0">0</button>
-          <button data-val=".">.</button>
-          <button id="calc-equals">=</button>
-          <button data-val="+">+</button>
-          <button id="calc-clear">C</button>
+          <button data-val="7" class="pill-btn">7</button>
+          <button data-val="8" class="pill-btn">8</button>
+          <button data-val="9" class="pill-btn">9</button>
+          <button data-val="/" class="pill-btn">/</button>
+          <button data-val="4" class="pill-btn">4</button>
+          <button data-val="5" class="pill-btn">5</button>
+          <button data-val="6" class="pill-btn">6</button>
+          <button data-val="*" class="pill-btn">*</button>
+          <button data-val="1" class="pill-btn">1</button>
+          <button data-val="2" class="pill-btn">2</button>
+          <button data-val="3" class="pill-btn">3</button>
+          <button data-val="-" class="pill-btn">-</button>
+          <button data-val="0" class="pill-btn">0</button>
+          <button data-val="." class="pill-btn">.</button>
+          <button id="calc-equals" class="pill-btn">=</button>
+          <button data-val="+" class="pill-btn">+</button>
+          <button id="calc-clear" class="pill-btn">C</button>
         </div>
       `;
-      appContainer.appendChild(calcDiv);
+      appContainer.innerHTML += calcDiv.outerHTML;
       const display = document.getElementById("calc-display");
       let expression = "";
       document.querySelectorAll("#calc-buttons button").forEach(btn => {
@@ -458,18 +442,22 @@
         sendData("calculator", expression);
       });
     }
+    function updateCalculatorDisplay(expr) {
+      const display = document.getElementById("calc-display");
+      if (display) { display.value = expr; }
+    }
 
-    /* ============================
+    /* ------------------------------
        Todo List App
-       ============================ */
+       ------------------------------ */
     function openTodoApp() {
       const todoDiv = document.createElement("div");
       todoDiv.innerHTML = `
         <input type="text" id="todo-input" placeholder="New task" />
-        <button id="add-todo-btn">Add Task</button>
+        <button id="add-todo-btn" class="pill-btn">Add Task</button>
         <ul id="todo-list"></ul>
       `;
-      appContainer.appendChild(todoDiv);
+      appContainer.innerHTML += todoDiv.outerHTML;
       document.getElementById("add-todo-btn").addEventListener("click", () => {
         const taskInput = document.getElementById("todo-input");
         if (taskInput.value.trim() !== "") {
@@ -499,18 +487,17 @@
       }
     }
 
-    /* ============================
+    /* ------------------------------
        Doodle Board App with Tabs
-       ============================ */
+       ------------------------------ */
     function openDoodleApp() {
       const doodleDiv = document.createElement("div");
       doodleDiv.innerHTML = `
         <div id="doodle-tab-bar"></div>
-        <button id="add-drawing-btn">Add Drawing</button>
+        <button id="add-drawing-btn" class="pill-btn">Add Drawing</button>
         <canvas id="doodle-canvas" width="300" height="200"></canvas>
       `;
-      appContainer.appendChild(doodleDiv);
-      // If no drawing exists, initialize one
+      appContainer.innerHTML += doodleDiv.outerHTML;
       if (drawings.length === 0) {
         drawings.push(null);
         currentDrawingIndex = 0;
@@ -573,7 +560,6 @@
       });
       canvas.addEventListener("mouseup", () => drawing = false);
       canvas.addEventListener("mouseout", () => drawing = false);
-      // Touch events for mobile
       canvas.addEventListener("touchstart", (e) => {
         e.preventDefault();
         drawing = true;
@@ -621,9 +607,9 @@
       }
     }
 
-    /* ============================
+    /* ------------------------------
        Notepad Formatting Functions
-       ============================ */
+       ------------------------------ */
     function execCmd(cmd) {
       document.execCommand(cmd, false, null);
     }
@@ -645,12 +631,13 @@
      - Copy the code and send it to your peer.
      - On the other device, click "Join Session (Receiver)", paste the code, and click "Submit Signal" to connect.
   3. Using the Mini‑Apps:
+     - Home Screen: Tap any app icon to enter that app.
      - Chat: Exchange messages.
-     - Notepad: Use the internal tabs to create and switch between multiple notes; use the formatting toolbar as needed.
+     - Notepad: Create multiple notes using the internal tabs and formatting toolbar.
      - Tic Tac Toe: Play a simple game.
      - Calculator: Enter expressions and see synchronized results.
      - Todo List: Add tasks and mark them complete.
-     - Doodle Board: Draw on the canvas; use the internal tabs to manage multiple drawings.
+     - Doodle Board: Draw on the canvas and use internal tabs to manage multiple drawings.
   Enjoy your Device Connector experience!
   ===============================
   -->
