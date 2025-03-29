@@ -153,7 +153,8 @@
     });
     submitSignalBtn.addEventListener("click", () => {
       const shortCode = signalInput.value;
-      const decompressed = LZString.decompressFromEncodedURIComponent(shortCode);
+      // Decompress using UTF16 variant
+      const decompressed = LZString.decompressFromUTF16(shortCode);
       try {
         const signalData = JSON.parse(decompressed);
         peer.signal(signalData);
@@ -161,8 +162,9 @@
         alert("Invalid connection code. Please ensure the code is correct.");
       }
     });
+    // Shorten connection signal using LZ-String's UTF16 methods
     function shortenSignal(text) {
-      return LZString.compressToEncodedURIComponent(text);
+      return LZString.compressToUTF16(text);
     }
     function startPeer(isInitiator) {
       peer = new SimplePeer({ initiator: isInitiator, trickle: false });
@@ -567,7 +569,6 @@
         drawLine(ctx, lastX, lastY, x, y);
         sendData("doodle", { action: "draw", index: currentDrawingIndex, from: { x: lastX, y: lastY }, to: { x, y } });
         [lastX, lastY] = [x, y];
-        // Save drawing state
         drawings[currentDrawingIndex] = canvas.toDataURL();
       });
       canvas.addEventListener("mouseup", () => drawing = false);
@@ -629,27 +630,29 @@
     function changeFont(font) {
       document.execCommand('fontName', false, font);
     }
-
-    /* ============================
-       Guide & Instructions (See HTML Comments)
-       ============================
-    1. Setup:
-       - Serve the files via HTTPS or on localhost (e.g., using "python -m http.server").
-       - Open index.html on two devices.
-       - For best experience, add Device Connector to your Home Screen.
-    2. Establishing the Connection:
-       - On one device, click "Create Session (Initiator)" to generate a short connection code.
-       - Copy the code and send it to your peer.
-       - On the other device, click "Join Session (Receiver)", paste the code, and click "Submit Signal" to connect.
-    3. Using the Mini‑Apps:
-       - Chat: Exchange messages.
-       - Notepad: Use the internal tabs to create and switch between multiple notes. Formatting options are available.
-       - Tic Tac Toe: Play a simple game.
-       - Calculator: Enter expressions and see synchronized results.
-       - Todo List: Add tasks and mark them complete.
-       - Doodle Board: Draw on the canvas; use internal tabs to manage multiple drawings.
-    Enjoy your Device Connector experience!
-    ============================ */
   </script>
+
+  <!--
+  ===============================
+  Guide & Instructions
+  ===============================
+  1. Setup:
+     - Serve these files via HTTPS or on localhost (e.g., using "python -m http.server").
+     - Open index.html on two devices.
+     - For the best experience, add Device Connector to your Home Screen.
+  2. Establishing the Connection:
+     - On one device, click "Create Session (Initiator)" to generate a short connection code.
+     - Copy the code and send it to your peer.
+     - On the other device, click "Join Session (Receiver)", paste the code, and click "Submit Signal" to connect.
+  3. Using the Mini‑Apps:
+     - Chat: Exchange messages.
+     - Notepad: Use the internal tabs to create and switch between multiple notes; use the formatting toolbar as needed.
+     - Tic Tac Toe: Play a simple game.
+     - Calculator: Enter expressions and see synchronized results.
+     - Todo List: Add tasks and mark them complete.
+     - Doodle Board: Draw on the canvas; use the internal tabs to manage multiple drawings.
+  Enjoy your Device Connector experience!
+  ===============================
+  -->
 </body>
 </html>
