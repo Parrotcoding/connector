@@ -17,12 +17,12 @@
 <body>
   <h1>Try Galaxy Mimic</h1>
   <div id="connection-section">
-    <button id="create-session-btn">Create Session</button>
-    <button id="join-session-btn">Join Session</button>
+    <button id="create-session-btn">Create Session (Initiator)</button>
+    <button id="join-session-btn">Join Session (Receiver)</button>
     <div id="signal-section" style="display:none;">
-      <p><strong>Copy this code and share it with your peer:</strong></p>
+      <p id="signal-instructions"><strong>Step 1:</strong> Copy the generated code and share it with your peer.</p>
       <textarea id="signal-output" placeholder="Signal code will appear here..." readonly></textarea>
-      <p><strong>Paste remote code here:</strong></p>
+      <p id="signal-paste"><strong>Step 2:</strong> Paste your peer's code below:</p>
       <textarea id="signal-input" placeholder="Paste remote signal code here"></textarea>
       <button id="submit-signal-btn">Submit Signal</button>
     </div>
@@ -56,50 +56,55 @@
     const appTabs = document.getElementById("app-tabs");
     const appContainer = document.getElementById("app-container");
 
-    // When the user creates or joins a session, start the peer
     createSessionBtn.addEventListener("click", () => {
       currentRole = "initiator";
+      console.log("Starting as initiator");
       startPeer(true);
       signalSection.style.display = "block";
     });
 
     joinSessionBtn.addEventListener("click", () => {
       currentRole = "receiver";
+      console.log("Starting as receiver");
       startPeer(false);
       signalSection.style.display = "block";
     });
 
-    // Submit the remote signal code
     submitSignalBtn.addEventListener("click", () => {
       const remoteSignal = signalInput.value;
       try {
         const signalData = JSON.parse(remoteSignal);
+        console.log("Submitting remote signal:", signalData);
         peer.signal(signalData);
       } catch (e) {
-        alert("Invalid signal data");
+        alert("Invalid signal data. Please ensure the code is copied correctly.");
       }
     });
 
     function startPeer(isInitiator) {
       peer = new SimplePeer({ initiator: isInitiator, trickle: false });
       
-      // When local signal data is generated, display it for copy-paste
       peer.on('signal', data => {
+        console.log("Local signal data generated:", data);
         signalOutput.value = JSON.stringify(data);
       });
 
-      // When connection is established, hide connection UI and show mini apps
       peer.on('connect', () => {
+        console.log("Peer connection established");
         alert("Connection established!");
         document.getElementById("connection-section").style.display = "none";
         appsSection.style.display = "block";
         setupApps();
       });
 
-      // Handle incoming data from the peer
+      peer.on('error', err => {
+        console.error("Peer error:", err);
+      });
+
       peer.on('data', data => {
         try {
           const message = JSON.parse(data);
+          console.log("Received data:", message);
           if (message.app === "chat") {
             appendChatMessage("Remote: " + message.payload);
           } else if (message.app === "notepad") {
@@ -113,25 +118,24 @@
       });
     }
 
-    // Function to send data through the peer connection
     function sendData(app, payload) {
       const message = JSON.stringify({ app, payload });
-      peer.send(message);
+      if (peer && peer.connected) {
+        peer.send(message);
+      } else {
+        console.warn("Peer not connected, cannot send data");
+      }
     }
 
-    // --- Mini Apps Setup ---
     function setupApps() {
-      // Tab switching for apps
       appTabs.addEventListener("click", e => {
         if (e.target && e.target.dataset.app) {
           openApp(e.target.dataset.app);
         }
       });
-      // Open default app
       openApp("chat");
     }
 
-    // Load a specific mini app into the app container
     function openApp(appName) {
       appContainer.innerHTML = "";
       if (appName === "chat") {
@@ -184,7 +188,6 @@
       }
     }
 
-    // --- Chat App Helper ---
     function appendChatMessage(msg) {
       const chatWindow = document.getElementById("chat-window");
       const p = document.createElement("p");
@@ -193,18 +196,12 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    // --- Tic Tac Toe App ---
     let tttBoard = Array(9).fill(null);
     let currentPlayer = "X";
 
     function initTicTacToe() {
       const cells = document.querySelectorAll("#ttt-board td");
       cells.forEach(cell => {
-        cell.style.width = "60px";
-        cell.style.height = "60px";
-        cell.style.textAlign = "center";
-        cell.style.fontSize = "24px";
-        cell.style.border = "1px solid #000";
         cell.addEventListener("click", function() {
           const index = parseInt(this.getAttribute("data-cell"));
           if (!tttBoard[index]) {
