@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Device Connector</title>
+  <title>Device Connector with Supabase</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -15,145 +15,134 @@
     <header>
       <h1>Device Connector</h1>
     </header>
-    
-    <!-- Notification container -->
-    <div id="notification-container"></div>
-    
+
     <!-- Connection Section -->
     <div id="connection-section">
       <button id="create-session-btn" class="pill-btn">Create Session (Initiator)</button>
       <button id="join-session-btn" class="pill-btn">Join Session (Receiver)</button>
+      <div id="session-code-section" style="display:none;">
+        <p id="session-code-display">Session Code: <span id="session-code"></span></p>
+      </div>
       <div id="signal-section" style="display:none;">
-        <p id="signal-instructions"><strong>Step 1:</strong> Copy the short connection code below and send it to your peer.</p>
-        <textarea id="signal-output" placeholder="Short connection code will appear here..." readonly></textarea>
+        <p id="signal-instructions"><strong>Step 1:</strong> Your signaling data:</p>
+        <textarea id="signal-output" placeholder="Signal data will appear here..." readonly></textarea>
         <button id="copy-code-btn" class="pill-btn">Copy Code</button>
-        <p id="signal-paste"><strong>Step 2:</strong> Paste your peer's code below.</p>
-        <textarea id="signal-input" placeholder="Paste remote connection code here"></textarea>
+        <p id="signal-paste"><strong>Step 2:</strong> Paste your peer's signaling data below:</p>
+        <textarea id="signal-input" placeholder="Paste peer signal data"></textarea>
         <button id="submit-signal-btn" class="pill-btn">Submit Signal</button>
       </div>
     </div>
 
-    <!-- Apps Section -->
+    <!-- Apps Section (for future collaborative features) -->
     <div id="apps-section" style="display:none;">
-      <!-- Home Screen Grid (collaborative apps only) -->
-      <div id="home-screen">
-        <div class="home-icon" data-app="chat">
-          <svg class="app-icon" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M20,2H4C2.897,2,2,2.897,2,4v16l4-4h14c1.103,0,2-0.897,2-2V4C22,2.897,21.103,2,20,2z"/>
-          </svg>
-          <span>Chat</span>
-        </div>
-        <div class="home-icon" data-app="notepad">
-          <svg class="app-icon" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M19,2H8C6.897,2,6,2.897,6,4v16c0,1.103,0.897,2,2,2h11c1.103,0,2-0.897,2-2V4C21,2.897,20.103,2,19,2z M19,20H8V4h11V20z"/>
-          </svg>
-          <span>Notepad</span>
-        </div>
-        <div class="home-icon" data-app="todo">
-          <svg class="app-icon" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
-            <polyline fill="none" stroke="currentColor" stroke-width="2" points="8,5 9,6 11,4"/>
-          </svg>
-          <span>Todo List</span>
-        </div>
-        <div class="home-icon" data-app="doodle">
-          <svg class="app-icon" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-width="2" d="M3 21l18-18"/>
-            <path fill="none" stroke="currentColor" stroke-width="2" d="M15 3l6 6"/>
-            <path fill="none" stroke="currentColor" stroke-width="2" d="M4 13l3 3L21 5l-3-3L4 13z"/>
-          </svg>
-          <span>Doodle Board</span>
-        </div>
-        <div class="home-icon" data-app="poll">
-          <svg class="app-icon" viewBox="0 0 24 24">
-            <rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"/>
-            <line x1="8" y1="8" x2="8" y2="16" stroke="currentColor" stroke-width="2"/>
-            <line x1="12" y1="8" x2="12" y2="16" stroke="currentColor" stroke-width="2"/>
-            <line x1="16" y1="8" x2="16" y2="16" stroke="currentColor" stroke-width="2"/>
-          </svg>
-          <span>Poll</span>
-        </div>
-        <div class="home-icon" data-app="story">
-          <svg class="app-icon" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-width="2" d="M4 4h16v16H4z"/>
-            <line x1="4" y1="8" x2="20" y2="8" stroke="currentColor" stroke-width="2"/>
-          </svg>
-          <span>Story</span>
-        </div>
-        <div class="home-icon" data-app="calendar">
-          <svg class="app-icon" viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"/>
-            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
-          </svg>
-          <span>Calendar</span>
-        </div>
-      </div>
-      <!-- App Container for individual mini-app content -->
-      <div id="app-container" style="display:none;"></div>
+      <p>Session established! You can now add collaborative applications here.</p>
+      <!-- Collaborative apps would be initialized here -->
     </div>
   </div>
 
-  <!-- Include SimplePeer and LZ-String -->
+  <!-- Include Supabase, SimplePeer, and LZ-String -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
   <script src="https://unpkg.com/simple-peer/simplepeer.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
   <script>
-    /* Global Variables */
-    let peer;
-    let currentRole = ""; // "initiator" or "receiver"
-    let currentApp = "home";
-    let chatHistory = [];
-    let notes = [{ title: "Note 1", content: "" }];
-    let currentNoteIndex = 0;
-    let drawings = [];
-    let currentDrawingIndex = 0;
-    let todoList = [];
-    let pollData = { question: "", options: [] }; // Each option: { text: "", votes: 0 }
-    let storyData = []; // Array of sentences
-    let calendarData = []; // Array of events: { date: "", description: "" }
+    // Replace with your Supabase project details:
+    const supabaseUrl = 'https://your-project.supabase.co';
+    const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    /* Notification system */
-    function showNotification(app, messageText) {
-      const container = document.getElementById("notification-container");
-      const notif = document.createElement("div");
-      notif.className = "notification pill-btn";
-      notif.textContent = messageText;
-      notif.onclick = () => { openApp(app); container.removeChild(notif); };
-      container.appendChild(notif);
-      // Auto-dismiss after 5 seconds if not clicked
-      setTimeout(() => { if (container.contains(notif)) container.removeChild(notif); }, 5000);
+    // Generate a random 6-character session ID
+    function generateSessionId() {
+      return Math.random().toString(36).substr(2, 6).toUpperCase();
     }
 
-    /* DOM Elements */
+    // Create a new session in Supabase with initial signal data
+    async function createSessionInDB(initialSignalData) {
+      const id = generateSessionId();
+      const { data, error } = await supabase
+        .from('sessions')
+        .insert([{ id: id, signal_data: initialSignalData }]);
+      if (error) {
+        console.error("Error creating session:", error);
+        return null;
+      }
+      return id;
+    }
+
+    // Retrieve a session from Supabase by session ID
+    async function getSessionFromDB(id) {
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('id', id)
+        .single();
+      if (error) {
+        console.error("Error retrieving session:", error);
+        return null;
+      }
+      return data;
+    }
+
+    // Update session data in Supabase
+    async function updateSessionInDB(id, newSignalData) {
+      const { data, error } = await supabase
+        .from('sessions')
+        .update({ signal_data: newSignalData })
+        .eq('id', id);
+      if (error) {
+        console.error("Error updating session:", error);
+        return null;
+      }
+      return data;
+    }
+
+    // Shorten signal data using LZString (encoded URI variant)
+    function shortenSignal(text) {
+      return LZString.compressToEncodedURIComponent(text);
+    }
+
+    // Global variables for WebRTC session
+    let peer;
+    let sessionId = "";
+    let isInitiator = false;
+
+    // DOM Elements
     const createSessionBtn = document.getElementById("create-session-btn");
     const joinSessionBtn = document.getElementById("join-session-btn");
+    const sessionCodeSection = document.getElementById("session-code-section");
+    const sessionCodeDisplay = document.getElementById("session-code");
     const signalSection = document.getElementById("signal-section");
     const signalOutput = document.getElementById("signal-output");
     const signalInput = document.getElementById("signal-input");
     const submitSignalBtn = document.getElementById("submit-signal-btn");
-    const appsSection = document.getElementById("apps-section");
-    const homeScreen = document.getElementById("home-screen");
-    const appContainer = document.getElementById("app-container");
     const copyCodeBtn = document.getElementById("copy-code-btn");
+    const appsSection = document.getElementById("apps-section");
 
-    /* Connection & Signaling */
-    createSessionBtn.addEventListener("click", () => {
-      currentRole = "initiator";
-      startPeer(true);
+    // Button event listeners
+    createSessionBtn.addEventListener("click", async () => {
+      isInitiator = true;
+      initPeer(isInitiator);
       signalSection.style.display = "block";
     });
-    joinSessionBtn.addEventListener("click", () => {
-      currentRole = "receiver";
-      startPeer(false);
+    joinSessionBtn.addEventListener("click", async () => {
+      isInitiator = false;
+      sessionId = prompt("Enter Session ID (6 characters):");
+      if (!sessionId) return;
+      const sessionData = await getSessionFromDB(sessionId);
+      if (!sessionData) {
+        alert("Session not found.");
+        return;
+      }
+      initPeer(isInitiator, sessionData.signal_data);
       signalSection.style.display = "block";
+      sessionCodeSection.style.display = "block";
+      sessionCodeDisplay.textContent = sessionId;
     });
     submitSignalBtn.addEventListener("click", () => {
-      const shortCode = signalInput.value;
-      const decompressed = LZString.decompressFromEncodedURIComponent(shortCode);
       try {
-        const signalData = JSON.parse(decompressed);
-        peer.signal(signalData);
+        const remoteData = JSON.parse(signalInput.value);
+        peer.signal(remoteData);
       } catch (e) {
-        alert("Invalid connection code. Please ensure the code is correct.");
+        alert("Invalid signaling data.");
       }
     });
     copyCodeBtn.addEventListener("click", () => {
@@ -161,530 +150,71 @@
         alert("Connection code copied!");
       });
     });
-    function shortenSignal(text) {
-      return LZString.compressToEncodedURIComponent(text);
-    }
-    function startPeer(isInitiator) {
-      peer = new SimplePeer({ initiator: isInitiator, trickle: false });
-      peer.on('signal', data => {
-        const signalString = JSON.stringify(data);
-        const shortCode = shortenSignal(signalString);
+
+    // Initialize SimplePeer; if joining, pass the remote signal data from Supabase
+    function initPeer(initiator, remoteSignalData = null) {
+      peer = new SimplePeer({ initiator: initiator, trickle: false });
+      peer.on('signal', async data => {
+        const dataStr = JSON.stringify(data);
+        const shortCode = shortenSignal(dataStr);
         signalOutput.value = shortCode;
+        if (initiator) {
+          if (!sessionId) {
+            // Create a new session in Supabase
+            sessionId = await createSessionInDB(data);
+            sessionCodeSection.style.display = "block";
+            sessionCodeDisplay.textContent = sessionId;
+          } else {
+            // Update existing session data
+            await updateSessionInDB(sessionId, data);
+          }
+        }
       });
       peer.on('connect', () => {
         alert("Connection established!");
         document.getElementById("connection-section").style.display = "none";
         appsSection.style.display = "block";
-        showHomeScreen();
+        // Here you would initialize your collaborative apps.
       });
       peer.on('error', err => console.error("Peer error:", err));
       peer.on('data', data => {
-        try {
-          const message = JSON.parse(data);
-          // Update global data for each collaborative app regardless
-          switch (message.app) {
-            case "chat":
-              chatHistory.push("Remote: " + message.payload);
-              if (currentApp !== "chat") showNotification("chat", "New chat message");
-              else renderChatHistory();
-              break;
-            case "notepad":
-              notes = message.payload;
-              if (currentApp === "notepad") { renderNotepadTabs(); renderNotepadContent(); }
-              else showNotification("notepad", "Notepad updated");
-              break;
-            case "todo":
-              todoList = message.payload;
-              if (currentApp === "todo") renderTodoList();
-              else showNotification("todo", "Todo list updated");
-              break;
-            case "doodle":
-              // If doodle board is open, update canvas; else update offscreen.
-              if (currentApp === "doodle") handleDoodleData(message.payload);
-              else updateOffscreenDoodle(message.payload);
-              showNotification("doodle", "Doodle board updated");
-              break;
-            case "poll":
-              pollData = message.payload;
-              if (currentApp === "poll") renderPoll();
-              else showNotification("poll", "Poll updated");
-              break;
-            case "story":
-              storyData = message.payload;
-              if (currentApp === "story") renderStory();
-              else showNotification("story", "Story updated");
-              break;
-            case "calendar":
-              calendarData = message.payload;
-              if (currentApp === "calendar") renderCalendar();
-              else showNotification("calendar", "Calendar updated");
-              break;
-          }
-        } catch (e) {
-          console.error("Error parsing data:", e);
-        }
+        console.log("Received data:", data.toString());
+        // Handle incoming collaborative data here.
       });
-    }
-    function sendData(app, payload) {
-      const message = JSON.stringify({ app, payload });
-      if (peer && peer.connected) {
-        peer.send(message);
-      }
-    }
-
-    /* Home Screen Navigation */
-    function showHomeScreen() {
-      currentApp = "home";
-      homeScreen.style.display = "grid";
-      appContainer.style.display = "none";
-    }
-    function openApp(appName) {
-      currentApp = appName;
-      homeScreen.style.display = "none";
-      appContainer.style.display = "block";
-      appContainer.innerHTML = `<button class="pill-btn back-btn" onclick="showHomeScreen()">Home</button>`;
-      switch (appName) {
-        case "chat": openChatApp(); break;
-        case "notepad": openNotepadApp(); break;
-        case "todo": openTodoApp(); break;
-        case "doodle": openDoodleApp(); break;
-        case "poll": openPollApp(); break;
-        case "story": openStoryApp(); break;
-        case "calendar": openCalendarApp(); break;
-      }
-    }
-    document.querySelectorAll(".home-icon").forEach(icon => {
-      icon.addEventListener("click", function() {
-        openApp(this.dataset.app);
-      });
-    });
-
-    /* ---------------------------
-       Chat App
-       --------------------------- */
-    function openChatApp() {
-      const chatDiv = document.createElement("div");
-      chatDiv.innerHTML = `
-        <div id="chat-window"></div>
-        <input type="text" id="chat-input" placeholder="Type a message" />
-        <button id="chat-send-btn" class="pill-btn">Send</button>
-      `;
-      appContainer.innerHTML += chatDiv.outerHTML;
-      renderChatHistory();
-      document.getElementById("chat-send-btn").addEventListener("click", () => {
-        const msg = document.getElementById("chat-input").value;
-        if (msg.trim() !== "") {
-          appendChatMessage("You: " + msg);
-          sendData("chat", msg);
-          document.getElementById("chat-input").value = "";
-        }
-      });
-    }
-    function renderChatHistory() {
-      const chatWindow = document.getElementById("chat-window");
-      if (chatWindow) {
-        chatWindow.innerHTML = "";
-        chatHistory.forEach(m => {
-          const p = document.createElement("p");
-          p.textContent = m;
-          chatWindow.appendChild(p);
-        });
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-      }
-    }
-    function appendChatMessage(msg) {
-      chatHistory.push(msg);
-      renderChatHistory();
-    }
-
-    /* ---------------------------
-       Notepad App with Tabs
-       --------------------------- */
-    function openNotepadApp() {
-      const npDiv = document.createElement("div");
-      npDiv.innerHTML = `
-        <div id="notepad-tab-bar"></div>
-        <button id="add-note-btn" class="pill-btn">Add Note</button>
-        <div id="notepad-content" contenteditable="true"></div>
-      `;
-      appContainer.innerHTML += npDiv.outerHTML;
-      renderNotepadTabs();
-      renderNotepadContent();
-      document.getElementById("notepad-content").addEventListener("input", function() {
-        notes[currentNoteIndex].content = this.innerHTML;
-        sendData("notepad", notes);
-      });
-      document.getElementById("add-note-btn").addEventListener("click", function() {
-        notes.push({ title: "Note " + (notes.length + 1), content: "" });
-        currentNoteIndex = notes.length - 1;
-        renderNotepadTabs();
-        renderNotepadContent();
-        sendData("notepad", notes);
-      });
-    }
-    function renderNotepadTabs() {
-      const tabBar = document.getElementById("notepad-tab-bar");
-      if (!tabBar) return;
-      tabBar.innerHTML = "";
-      notes.forEach((note, i) => {
-        const tab = document.createElement("button");
-        tab.textContent = note.title;
-        tab.className = (i === currentNoteIndex) ? "active-note-tab" : "";
-        tab.addEventListener("click", function() {
-          currentNoteIndex = i;
-          renderNotepadTabs();
-          renderNotepadContent();
-        });
-        tabBar.appendChild(tab);
-      });
-    }
-    function renderNotepadContent() {
-      const contentArea = document.getElementById("notepad-content");
-      if (contentArea) contentArea.innerHTML = notes[currentNoteIndex].content;
-    }
-
-    /* ---------------------------
-       Todo List App
-       --------------------------- */
-    function openTodoApp() {
-      const tdDiv = document.createElement("div");
-      tdDiv.innerHTML = `
-        <input type="text" id="todo-input" placeholder="New task" />
-        <button id="add-todo-btn" class="pill-btn">Add Task</button>
-        <ul id="todo-list"></ul>
-      `;
-      appContainer.innerHTML += tdDiv.outerHTML;
-      document.getElementById("add-todo-btn").addEventListener("click", () => {
-        const taskInput = document.getElementById("todo-input");
-        if (taskInput.value.trim() !== "") {
-          todoList.push({ text: taskInput.value, done: false });
-          taskInput.value = "";
-          renderTodoList();
-          sendData("todo", todoList);
-        }
-      });
-      renderTodoList();
-    }
-    function renderTodoList() {
-      const ul = document.getElementById("todo-list");
-      if (ul) {
-        ul.innerHTML = "";
-        todoList.forEach((task, i) => {
-          const li = document.createElement("li");
-          li.textContent = task.text;
-          li.style.textDecoration = task.done ? "line-through" : "none";
-          li.addEventListener("click", () => {
-            todoList[i].done = !todoList[i].done;
-            renderTodoList();
-            sendData("todo", todoList);
-          });
-          ul.appendChild(li);
-        });
-      }
-    }
-
-    /* ---------------------------
-       Doodle Board App with Tabs
-       --------------------------- */
-    function openDoodleApp() {
-      const ddDiv = document.createElement("div");
-      ddDiv.innerHTML = `
-        <div id="doodle-tab-bar"></div>
-        <button id="add-drawing-btn" class="pill-btn">Add Drawing</button>
-        <canvas id="doodle-canvas" width="300" height="200"></canvas>
-      `;
-      appContainer.innerHTML += ddDiv.outerHTML;
-      if (drawings.length === 0) {
-        drawings.push(null);
-        currentDrawingIndex = 0;
-      }
-      renderDoodleTabs();
-      initDoodleBoard();
-      document.getElementById("add-drawing-btn").addEventListener("click", function() {
-        drawings.push(null);
-        currentDrawingIndex = drawings.length - 1;
-        renderDoodleTabs();
-        const canvas = document.getElementById("doodle-canvas");
-        if (canvas) {
-          const ctx = canvas.getContext("2d");
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-        sendData("doodle", { action: "newDrawing", index: currentDrawingIndex });
-      });
-    }
-    function renderDoodleTabs() {
-      const tabBar = document.getElementById("doodle-tab-bar");
-      if (!tabBar) return;
-      tabBar.innerHTML = "";
-      drawings.forEach((d, i) => {
-        const tab = document.createElement("button");
-        tab.textContent = "Drawing " + (i + 1);
-        tab.className = (i === currentDrawingIndex) ? "active-doodle-tab" : "";
-        tab.addEventListener("click", function() {
-          currentDrawingIndex = i;
-          renderDoodleTabs();
-          const canvas = document.getElementById("doodle-canvas");
-          const ctx = canvas.getContext("2d");
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          if (drawings[i]) {
-            const img = new Image();
-            img.onload = () => { ctx.drawImage(img, 0, 0); };
-            img.src = drawings[i];
-          }
-        });
-        tabBar.appendChild(tab);
-      });
-    }
-    function initDoodleBoard() {
-      const canvas = document.getElementById("doodle-canvas");
-      const ctx = canvas.getContext("2d");
-      let drawing = false, lastX, lastY;
-      canvas.addEventListener("mousedown", (e) => {
-        drawing = true;
-        [lastX, lastY] = [e.offsetX, e.offsetY];
-      });
-      canvas.addEventListener("mousemove", (e) => {
-        if (!drawing) return;
-        const x = e.offsetX, y = e.offsetY;
-        drawLine(ctx, lastX, lastY, x, y);
-        sendData("doodle", { action: "draw", index: currentDrawingIndex, from: { x: lastX, y: lastY }, to: { x, y } });
-        [lastX, lastY] = [x, y];
-        drawings[currentDrawingIndex] = canvas.toDataURL();
-      });
-      canvas.addEventListener("mouseup", () => drawing = false);
-      canvas.addEventListener("mouseout", () => drawing = false);
-      canvas.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        drawing = true;
-        const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        lastX = touch.clientX - rect.left;
-        lastY = touch.clientY - rect.top;
-      });
-      canvas.addEventListener("touchmove", (e) => {
-        e.preventDefault();
-        if (!drawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
-        drawLine(ctx, lastX, lastY, x, y);
-        sendData("doodle", { action: "draw", index: currentDrawingIndex, from: { x: lastX, y: lastY }, to: { x, y } });
-        [lastX, lastY] = [x, y];
-        drawings[currentDrawingIndex] = canvas.toDataURL();
-      });
-      canvas.addEventListener("touchend", () => drawing = false);
-    }
-    function drawLine(ctx, x1, y1, x2, y2) {
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.strokeStyle = "#000";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-    function handleDoodleData(payload) {
-      // If doodle board is visible, update canvas; otherwise, update offscreen.
-      const canvas = document.getElementById("doodle-canvas");
-      if (canvas) {
-        const ctx = canvas.getContext("2d");
-        if (payload.action === "draw" && payload.index === currentDrawingIndex) {
-          drawLine(ctx, payload.from.x, payload.from.y, payload.to.x, payload.to.y);
-          drawings[currentDrawingIndex] = canvas.toDataURL();
-        } else if (payload.action === "newDrawing") {
-          if (!drawings[payload.index]) {
-            drawings[payload.index] = null;
-            renderDoodleTabs();
-          }
-        }
-      } else {
-        // Offscreen update: create a temporary canvas
-        const offCanvas = document.createElement("canvas");
-        offCanvas.width = 300;
-        offCanvas.height = 200;
-        const offCtx = offCanvas.getContext("2d");
-        if (drawings[payload.index]) {
-          const img = new Image();
-          img.onload = () => {
-            offCtx.drawImage(img, 0, 0);
-            offCtx.beginPath();
-            offCtx.moveTo(payload.from.x, payload.from.y);
-            offCtx.lineTo(payload.to.x, payload.to.y);
-            offCtx.strokeStyle = "#000";
-            offCtx.lineWidth = 2;
-            offCtx.stroke();
-            drawings[payload.index] = offCanvas.toDataURL();
-          };
-          img.src = drawings[payload.index];
-        } else {
-          offCtx.beginPath();
-          offCtx.moveTo(payload.from.x, payload.from.y);
-          offCtx.lineTo(payload.to.x, payload.to.y);
-          offCtx.strokeStyle = "#000";
-          offCtx.lineWidth = 2;
-          offCtx.stroke();
-          drawings[payload.index] = offCanvas.toDataURL();
-        }
-      }
-    }
-
-    /* ---------------------------
-       Poll App
-       --------------------------- */
-    function openPollApp() {
-      const pollDiv = document.createElement("div");
-      pollDiv.innerHTML = `
-        <p>Poll Question:</p>
-        <input type="text" id="poll-question" placeholder="Enter question" />
-        <p>Add Option:</p>
-        <input type="text" id="poll-option" placeholder="Option text" />
-        <button id="add-option-btn" class="pill-btn">Add Option</button>
-        <div id="poll-options"></div>
-        <p id="poll-results"></p>
-      `;
-      appContainer.innerHTML += pollDiv.outerHTML;
-      // Initialize if no question exists
-      if (!pollData.question) pollData = { question: "", options: [] };
-      document.getElementById("add-option-btn").addEventListener("click", () => {
-        const optText = document.getElementById("poll-option").value;
-        if (optText.trim() !== "") {
-          pollData.options.push({ text: optText, votes: 0 });
-          document.getElementById("poll-option").value = "";
-          renderPoll();
-          sendData("poll", pollData);
-        }
-      });
-      // When the question field loses focus, update the question
-      document.getElementById("poll-question").addEventListener("change", () => {
-        pollData.question = document.getElementById("poll-question").value;
-        renderPoll();
-        sendData("poll", pollData);
-      });
-      renderPoll();
-    }
-    function renderPoll() {
-      const optDiv = document.getElementById("poll-options");
-      const resP = document.getElementById("poll-results");
-      if (optDiv) {
-        optDiv.innerHTML = "";
-        pollData.options.forEach((opt, i) => {
-          const btn = document.createElement("button");
-          btn.className = "pill-btn";
-          btn.textContent = opt.text + " (" + opt.votes + ")";
-          btn.addEventListener("click", () => {
-            // On vote, increment vote count
-            pollData.options[i].votes++;
-            renderPoll();
-            sendData("poll", pollData);
-          });
-          optDiv.appendChild(btn);
-        });
-      }
-      if (resP) {
-        resP.textContent = "Total Votes: " + pollData.options.reduce((a, b) => a + b.votes, 0);
-      }
-      // If pollData.question is not empty, fill the input
-      const qInput = document.getElementById("poll-question");
-      if (qInput) qInput.value = pollData.question;
-    }
-
-    /* ---------------------------
-       Story App
-       --------------------------- */
-    function openStoryApp() {
-      const storyDiv = document.createElement("div");
-      storyDiv.innerHTML = `
-        <div id="story-display"></div>
-        <input type="text" id="story-input" placeholder="Add a sentence" />
-        <button id="story-add-btn" class="pill-btn">Add Sentence</button>
-      `;
-      appContainer.innerHTML += storyDiv.outerHTML;
-      renderStory();
-      document.getElementById("story-add-btn").addEventListener("click", () => {
-        const sentence = document.getElementById("story-input").value;
-        if (sentence.trim() !== "") {
-          storyData.push(sentence);
-          renderStory();
-          sendData("story", storyData);
-          document.getElementById("story-input").value = "";
-        }
-      });
-    }
-    function renderStory() {
-      const display = document.getElementById("story-display");
-      if (display) {
-        display.innerHTML = "";
-        storyData.forEach((s, i) => {
-          const p = document.createElement("p");
-          p.textContent = (i+1) + ". " + s;
-          display.appendChild(p);
-        });
-      }
-    }
-
-    /* ---------------------------
-       Calendar App
-       --------------------------- */
-    function openCalendarApp() {
-      const calDiv = document.createElement("div");
-      calDiv.innerHTML = `
-        <p>Add Event:</p>
-        <input type="date" id="event-date" />
-        <input type="text" id="event-desc" placeholder="Event description" />
-        <button id="add-event-btn" class="pill-btn">Add Event</button>
-        <div id="event-list"></div>
-      `;
-      appContainer.innerHTML += calDiv.outerHTML;
-      document.getElementById("add-event-btn").addEventListener("click", () => {
-        const date = document.getElementById("event-date").value;
-        const desc = document.getElementById("event-desc").value;
-        if (date && desc.trim() !== "") {
-          calendarData.push({ date, description: desc });
-          renderCalendar();
-          sendData("calendar", calendarData);
-          document.getElementById("event-date").value = "";
-          document.getElementById("event-desc").value = "";
-        }
-      });
-      renderCalendar();
-    }
-    function renderCalendar() {
-      const listDiv = document.getElementById("event-list");
-      if (listDiv) {
-        listDiv.innerHTML = "";
-        calendarData.forEach(event => {
-          const p = document.createElement("p");
-          p.textContent = event.date + ": " + event.description;
-          listDiv.appendChild(p);
-        });
+      if (!initiator && remoteSignalData) {
+        peer.signal(remoteSignalData);
       }
     }
   </script>
 
   <!--
-  ===============================
-  Guide & Instructions
-  ===============================
-  1. Setup:
-     - Serve this file via HTTPS or on localhost (e.g., using "python -m http.server").
-     - Open the page on your device.
-     - For best experience, add Device Connector to your Home Screen.
-  2. Connection:
-     - Use "Create Session" or "Join Session" to establish a peer connection.
-     - Use the "Copy Code" button to copy your connection code and paste your peer's code in the provided field.
-  3. Home Screen:
-     - Once connected, a grid of collaborative app icons is displayed.
-     - Tap an icon to open that mini‑app; use the "Home" button to return.
-        • Chat: Exchange messages.
-        • Notepad: Create multiple notes with tabs and formatting.
-        • Todo List: Manage tasks.
-        • Doodle Board: Draw collaboratively (updates now sync even if the other peer isn’t on doodle).
-        • Poll: Create a poll, add options, and vote.
-        • Story: Collaboratively build a story sentence by sentence.
-        • Calendar: Add and view shared events.
-     - When a remote update (e.g. a new chat message or task) arrives while you’re not in that app, a pill‑shaped notification will appear at the top. Click the notification to open the corresponding app.
-  Enjoy your Device Connector experience!
-  ===============================
+  Directions:
+
+  1. Supabase Setup:
+     - Create a project at https://supabase.io.
+     - In the SQL editor, run:
+       
+       CREATE TABLE sessions (
+         id text PRIMARY KEY,
+         signal_data jsonb,
+         updated_at timestamp with time zone DEFAULT now()
+       );
+
+     - Enable RLS on the table and add policies to allow read and update only for rows matching the session ID.
+     - Replace supabaseUrl and supabaseKey in the code with your project’s values.
+
+  2. Running the App:
+     - Save this file as index.html and save the accompanying styles.css in the same folder.
+     - Serve the files via HTTPS or on localhost (e.g., using "python -m http.server").
+     - On the initiator device, click "Create Session." A 6‑character session ID will be generated and displayed, and your WebRTC offer is stored in Supabase.
+     - Share that session code with your peer.
+     - On the receiver device, click "Join Session" and enter the session ID. The app retrieves the signaling data from Supabase and completes the WebRTC handshake.
+     - Session data persists in Supabase even after exiting.
+
+  3. Collaboration:
+     - Use sendData() and peer.on('data') to build additional collaborative features.
+  
+  Enjoy your Device Connector experience with persistent, short-code sessions!
   -->
 </body>
 </html>
